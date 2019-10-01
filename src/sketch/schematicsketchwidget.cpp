@@ -144,7 +144,7 @@ void SchematicSketchWidget::setNewPartVisible(ItemBase * itemBase) {
 	switch (itemBase->itemType()) {
 	case ModelPart::Logo:
 		if (itemBase->moduleID().contains("schematic", Qt::CaseInsensitive)) break;
-		[[clang::fallthrough]];
+		__attribute__ ((fallthrough));
 	case ModelPart::Breadboard:
 	case ModelPart::Jumper:
 	case ModelPart::CopperFill:
