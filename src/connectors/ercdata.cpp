@@ -149,11 +149,3 @@ void ErcData::writeVoltage(QDomElement & parent, QDomDocument & doc) {
 		}
 	}
 }
-
-ErcData::EType ErcData::eType() {
-	return m_eType;
-}
-
-ErcData::Ignore ErcData::ignore() {
-	return m_ignore;
-}

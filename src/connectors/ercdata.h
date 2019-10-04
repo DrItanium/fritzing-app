@@ -66,8 +66,8 @@ public:
 	ErcData(const QDomElement & ercElement);
 
 	bool writeToElement(QDomElement & ercElement, QDomDocument & doc);
-	EType eType();
-	Ignore ignore();
+	constexpr EType eType() const noexcept { return m_eType; }
+	constexpr Ignore ignore() const noexcept { return m_ignore; }
 
 protected:
 	void readVoltage(QDomElement &);

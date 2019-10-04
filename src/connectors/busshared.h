@@ -28,22 +28,23 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include <QXmlStreamWriter>
 #include <QPointer>
 
+class ConnectorShared;
 class BusShared {
 
 public:
-	BusShared(const QDomElement & busElement, const QHash<QString, QPointer<class ConnectorShared> > & connectorHash);
+	BusShared(const QDomElement & busElement, const QHash<QString, QPointer<ConnectorShared> > & connectorHash);
 	BusShared(const QString & id);
 
-	const QString & id() const;
-	const QList<class ConnectorShared *> & connectors();
+	const QString & id() const noexcept { return m_id; }
+	const QList<ConnectorShared *> & connectors();
 	void addConnectorShared(class ConnectorShared *);
 
 protected:
-	void initConnector(QDomElement & connector, const QHash<QString, QPointer<class ConnectorShared> > & connectorHash);
+	void initConnector(QDomElement & connector, const QHash<QString, QPointer<ConnectorShared> > & connectorHash);
 
 protected:
 	QString m_id;
-	QList<class ConnectorShared *> m_connectors;
+	QList<ConnectorShared *> m_connectors;
 };
 
 #endif
