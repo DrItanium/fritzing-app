@@ -30,7 +30,11 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include <QPointer>
 
 #include "../viewlayer.h"
-
+class ConnectorShared;
+class ModelPart;
+class SvgIdLayer;
+class ConnectorItem;
+class Bus;
 class Connector : public QObject
 {
 	Q_OBJECT
@@ -44,12 +48,12 @@ public:
 	};
 
 public:
-	Connector(class ConnectorShared *, class ModelPart * modelPart);
+	Connector(ConnectorShared *, ModelPart * modelPart);
 	~Connector();
 
 	Connector::ConnectorType connectorType() const;
-	void addViewItem(class ConnectorItem *);
-	void removeViewItem(class ConnectorItem *);
+	void addViewItem(ConnectorItem *);
+	void removeViewItem(ConnectorItem *);
 	class ConnectorShared * connectorShared();
 	void connectTo(Connector *);
 	void disconnectFrom(Connector *);
@@ -64,18 +68,18 @@ public:
 	const QString & connectorSharedReplacedby() const;
 	class ErcData * connectorSharedErcData();
 	const QString & busID();
-	class Bus * bus();
+	Bus * bus();
 	void setBus(class Bus *);
 	long modelIndex();
 	ModelPart * modelPart();
 	int connectorItemCount();
 	void unprocess(ViewLayer::ViewID viewID, ViewLayer::ViewLayerID viewLayerID);
-	class SvgIdLayer * fullPinInfo(ViewLayer::ViewID viewId, ViewLayer::ViewLayerID viewLayerID);
+	SvgIdLayer * fullPinInfo(ViewLayer::ViewID viewId, ViewLayer::ViewLayerID viewLayerID);
 	const QList<SvgIdLayer *> svgIdLayers() const;
-	QList< QPointer<class ConnectorItem> > viewItems();
+	QList< QPointer<ConnectorItem> > viewItems();
 	const QString & legID(ViewLayer::ViewID, ViewLayer::ViewLayerID);
 	void setConnectorLocalName(const QString &);
-	const QString & connectorLocalName();
+	constexpr const QString & connectorLocalName() const noexcept { return m_connectorLocalName; }
 	void addPin(ViewLayer::ViewID, const QString & svgId, ViewLayer::ViewLayerID, const QString & terminalId, const QString & legId, bool hybrid);
 
 public:
@@ -89,11 +93,11 @@ protected:
 	void writeTerminalIdAttr(QXmlStreamWriter &writer, ViewLayer::ViewID view, QString terminalId);
 
 protected:
-	QPointer<class ConnectorShared> m_connectorShared;
-	QHash< int, QPointer<class ConnectorItem> > m_connectorItems;
+	QPointer<ConnectorShared> m_connectorShared;
+	QPointer<ModelPart> m_modelPart;
+	QPointer<Bus> m_bus;
+	QHash< int, QPointer<ConnectorItem> > m_connectorItems;
 	QList<Connector *> m_toConnectors;
-	QPointer<class ModelPart> m_modelPart;
-	QPointer<class Bus> m_bus;
 	QString m_connectorLocalName;
 
 protected:

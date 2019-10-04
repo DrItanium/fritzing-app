@@ -34,11 +34,12 @@ static inline int QuickHash(ViewLayer::ViewID viewID, ViewLayer::ViewLayerID vie
 	return (1000 * viewID) + viewLayerID;
 }
 
-Connector::Connector( ConnectorShared * connectorShared, ModelPart * modelPart)
+Connector::Connector( ConnectorShared * connectorShared, ModelPart * modelPart) :
+		m_connectorShared(connectorShared),
+		m_modelPart(modelPart),
+		m_bus(nullptr)
 {
-	m_modelPart = modelPart;
-	m_connectorShared = connectorShared;
-	m_bus = NULL;
+
 }
 
 Connector::~Connector() {
