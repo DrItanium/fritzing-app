@@ -78,13 +78,13 @@ protected:
 protected:
 	EType m_eType;
 	Ignore m_ignore;
+	CurrentFlow m_currentFlow;
 	ValidReal m_voltage;
 	ValidReal m_voltageMin;
 	ValidReal m_voltageMax;
 	ValidReal m_current;
 	ValidReal m_currentMin;
 	ValidReal m_currentMax;
-	CurrentFlow m_currentFlow;
 };
 
 #endif
