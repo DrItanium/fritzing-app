@@ -34,12 +34,12 @@ QList<QString> ModelBase::CoreList;
 
 /////////////////////////////////////////////////
 
-ModelBase::ModelBase( bool makeRoot )
+ModelBase::ModelBase( bool makeRoot ) : QObject(), m_root(nullptr),
+		m_referenceModel(nullptr),
+		m_reportMissingModules(true),
+		m_useOldSchematics(false),
+		m_checkForReversedWires(false)
 {
-	m_checkForReversedWires = m_useOldSchematics = false;
-	m_reportMissingModules = true;
-	m_referenceModel = NULL;
-	m_root = NULL;
 	if (makeRoot) {
 		m_root = new ModelPart();
 		m_root->setModelPartShared(new ModelPartSharedRoot());
@@ -55,10 +55,6 @@ ModelBase::~ModelBase() {
 		}
 		delete m_root;
 	}
-}
-
-ModelPart * ModelBase::root() {
-	return m_root;
 }
 
 ModelPart * ModelBase::retrieveModelPart(const QString & /* moduleID */)  {
@@ -594,9 +590,11 @@ ModelPart * ModelBase::genFZP(const QString & moduleID, ModelBase * referenceMod
 }
 
 ModelPartSharedRoot * ModelBase::rootModelPartShared() {
-	if (m_root == NULL) return NULL;
-
-	return m_root->modelPartSharedRoot();
+	if (!m_root) {
+		return nullptr;
+	} else {
+		return m_root->modelPartSharedRoot();
+	}
 }
 
 bool ModelBase::isRatsnest(QDomElement & instance) {
@@ -743,10 +741,6 @@ void ModelBase::checkTraces(QDomElement & instance) {
 	DebugDialog::debug(QString("no wire view elements in fz file %1").arg(string));
 }
 
-const QString & ModelBase::fritzingVersion() {
-	return m_fritzingVersion;
-}
-
 void ModelBase::setReferenceModel(ModelBase * modelBase) {
 	m_referenceModel = modelBase;
 }
@@ -876,6 +870,3 @@ ModelPart * ModelBase::createOldSchematicPartAux(ModelPart * modelPart, const QS
 	return oldModelPart;
 }
 
-bool ModelBase::checkForReversedWires() {
-	return m_checkForReversedWires;
-}

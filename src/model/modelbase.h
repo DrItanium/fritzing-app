@@ -32,7 +32,7 @@ public:
 	ModelBase(bool makeRoot);
 	virtual ~ModelBase();
 
-	ModelPart * root();
+	ModelPart * root() { return m_root; }
 	ModelPartSharedRoot * rootModelPartShared();
 	virtual ModelPart* retrieveModelPart(const QString & moduleID);
 	virtual ModelPart * addModelPart(ModelPart * parent, ModelPart * copyChild);
@@ -45,9 +45,9 @@ public:
 	bool paste(ModelBase * referenceModel, QByteArray & data, QList<ModelPart *> & modelParts, QHash<QString, QRectF> & boundingRects, bool preserveIndex);
 	void setReportMissingModules(bool);
 	ModelPart * genFZP(const QString & moduleID, ModelBase * referenceModel);
-	const QString & fritzingVersion();
+	const QString & fritzingVersion() const { return m_fritzingVersion; }
 	void setReferenceModel(ModelBase *);
-	bool checkForReversedWires();
+	bool checkForReversedWires() const { return m_checkForReversedWires; }
 
 public:
 	static bool onCoreList(const QString & moduleID);
@@ -77,10 +77,9 @@ protected:
 	QPointer<ModelPart> m_root;
 	QPointer<ModelBase> m_referenceModel;
 	bool m_reportMissingModules;
-	QString m_fritzingVersion;
 	bool m_useOldSchematics;
 	bool m_checkForReversedWires;
-
+	QString m_fritzingVersion;
 protected:
 	static QList<QString> CoreList;
 
