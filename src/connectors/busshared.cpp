@@ -24,14 +24,12 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include "connectoritem.h"
 #include "../utils/textutils.h"
 
-BusShared::BusShared(const QString & id)
-{
-	m_id = id;
-}
+BusShared::BusShared(const QString & id) : m_id(id) { }
 
-BusShared::BusShared(const QDomElement & busElement, const QHash<QString, QPointer<ConnectorShared> > & connectorHash)
+BusShared::BusShared(const QDomElement & busElement,
+		const QHash<QString, QPointer<ConnectorShared> > & connectorHash) :
+		m_id(busElement.attribute("id"))
 {
-	m_id = busElement.attribute("id");
 
 	QDomElement connector = busElement.firstChildElement("nodeMember");
 	while (!connector.isNull()) {
@@ -65,11 +63,6 @@ void BusShared::addConnectorShared(ConnectorShared * connectorShared)
 	connectorShared->setBus(this);
 }
 
-const QString & BusShared::id() const {
-	return m_id;
-}
-
-
-const QList<ConnectorShared *> & BusShared::connectors() {
+const QList<ConnectorShared *> & BusShared::connectors() const noexcept {
 	return m_connectors;
 }

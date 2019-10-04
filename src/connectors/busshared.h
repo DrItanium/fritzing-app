@@ -35,8 +35,8 @@ public:
 	BusShared(const QDomElement & busElement, const QHash<QString, QPointer<ConnectorShared> > & connectorHash);
 	BusShared(const QString & id);
 
-	const QString & id() const;
-	const QList<class ConnectorShared *> & connectors();
+	constexpr const QString & id() const noexcept { return m_id; }
+	const QList<class ConnectorShared *> & connectors() const noexcept;
 	void addConnectorShared(ConnectorShared *);
 
 protected:
