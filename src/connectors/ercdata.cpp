@@ -34,8 +34,8 @@ bool ValidReal::setValue(const QString & v) {
 
 ErcData::ErcData(const QDomElement & ercElement) :
 		m_eType(UnknownEType),
-		m_currentFlow(UnknownFlow),
-		m_ignore(Never)
+		m_ignore(Never),
+		m_currentFlow(UnknownFlow)
 {
 
 
