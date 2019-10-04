@@ -28,11 +28,11 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 
 class ValidReal {
 public:
-	ValidReal();
+	constexpr ValidReal() : m_ok(false), m_value(0.0) { }
 
-	bool isValid();
-	double value();
-	void setValue(double);
+	constexpr bool isValid() const noexcept { return m_ok; }
+	constexpr double value() const noexcept { return m_value; }
+	void setValue(double) noexcept;
 	bool setValue(const QString &);
 
 protected:

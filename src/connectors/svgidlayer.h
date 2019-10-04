@@ -29,8 +29,8 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 struct PointRect {
 	QRectF rect;
 	QPointF point;
-	bool processed;
-	bool svgVisible;
+	bool processed = false;
+	bool svgVisible = false;
 };
 
 class SvgIdLayer
@@ -48,18 +48,19 @@ public:
 	void setPointRect(ViewLayer::ViewLayerPlacement, QPointF, QRectF, bool svgVisible);
 
 public:
-	QString m_svgId;
-	QString m_terminalId;
 	ViewLayer::ViewID m_viewID;
-	ViewLayer::ViewLayerID m_svgViewLayerID;
-	bool m_hybrid;
-	double m_radius;
-	double m_strokeWidth;
+	bool m_hybrid = false;
+	double m_radius = 0.0;
+	double m_strokeWidth = 0.0;
+	double m_legStrokeWidth = 0.0;
+	bool m_path = false;
 	QString m_legId;
 	QString m_legColor;
-	double m_legStrokeWidth;
+	QString m_svgId;
+	QString m_terminalId;
+	ViewLayer::ViewLayerID m_svgViewLayerID;
 	QLineF m_legLine;
-	bool m_path;
+
 
 protected:
 	PointRect m_pointRectBottom;

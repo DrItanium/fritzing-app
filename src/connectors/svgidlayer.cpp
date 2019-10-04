@@ -20,11 +20,7 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "svgidlayer.h"
 
-SvgIdLayer::SvgIdLayer(ViewLayer::ViewID viewID) {
-	m_viewID = viewID;
-	m_pointRectBottom.processed = m_pointRectTop.processed = m_path = m_hybrid = false;
-	m_radius = m_strokeWidth = 0;
-}
+SvgIdLayer::SvgIdLayer(ViewLayer::ViewID viewID) : m_viewID(viewID) { }
 
 SvgIdLayer * SvgIdLayer::copyLayer() {
 	SvgIdLayer * toSvgIdLayer = new SvgIdLayer(m_viewID);

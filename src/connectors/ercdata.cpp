@@ -20,19 +20,7 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "ercdata.h"
 
-ValidReal::ValidReal() {
-	m_ok = false;
-}
-
-bool ValidReal::isValid() {
-	return m_ok;
-}
-
-double ValidReal::value() {
-	return m_value;
-}
-
-void ValidReal::setValue(double v) {
+void ValidReal::setValue(double v) noexcept {
 	m_value = v;
 	m_ok = true;
 }
