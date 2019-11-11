@@ -419,7 +419,7 @@ bool DRC::startAux(QString & message, QStringList & messages, QList<CollidingThi
 		QDomElement root = masterDoc->documentElement();
 		SvgFileSplitter::forceStrokeWidth(root, 2 * keepoutMils, "#000000", true, false);
 
-		ItemBase::renderOne(masterDoc, m_plusImage, sourceRes);
+		ItemBase::renderOne(masterDoc, m_plusImage.get(), sourceRes);
 
 		ProcessEventBlocker::processEvents();
 		if (m_cancelled) {
@@ -428,7 +428,7 @@ bool DRC::startAux(QString & message, QStringList & messages, QList<CollidingThi
 		}
 
 		QList<QPointF> atPixels;
-		if (pixelsCollide(m_plusImage, m_minusImage, m_displayImage, 0, 0, imgSize.width(), imgSize.height(), 1 /* 0x80ff0000 */, atPixels)) {
+		if (pixelsCollide(m_plusImage.get(), m_minusImage, m_displayImage, 0, 0, imgSize.width(), imgSize.height(), 1 /* 0x80ff0000 */, atPixels)) {
 			CollidingThing * collidingThing = findItemsAt(atPixels, m_board, viewLayerIDs, keepoutMils, dpi, true, nullptr);
 			QString msg = tr("Too close to a border (%1 layer)")
 						  .arg(viewLayerPlacement == ViewLayer::NewTop ? ItemBase::TranslatedPropertyNames.value("top") : ItemBase::TranslatedPropertyNames.value("bottom"))
@@ -496,7 +496,7 @@ bool DRC::startAux(QString & message, QStringList & messages, QList<CollidingThi
 			// we have a net;
 			m_plusImage->fill(0xffffffff);
 			m_minusImage->fill(0xffffffff);
-			splitNet(masterDoc, equi, m_minusImage, m_plusImage, sourceRes, viewLayerPlacement, index++, keepoutMils);
+			splitNet(masterDoc, equi, m_minusImage, m_plusImage.get(), sourceRes, viewLayerPlacement, index++, keepoutMils);
 
 			QHash<ConnectorItem *, QRectF> rects;
 			QList<Wire *> wires;
@@ -530,7 +530,7 @@ bool DRC::startAux(QString & message, QStringList & messages, QList<CollidingThi
 				double b = (rect.bottom() - boardRect.top()) * dpi / GraphicsUtils::SVGDPI;
 				//DebugDialog::debug(QString("l:%1 t:%2 r:%3 b:%4").arg(l).arg(t).arg(r).arg(b));
 				QList<QPointF> atPixels;
-				if (pixelsCollide(m_plusImage, m_minusImage, m_displayImage, l, t, r, b, 1 /* 0x80ff0000 */, atPixels)) {
+				if (pixelsCollide(m_plusImage.get(), m_minusImage, m_displayImage, l, t, r, b, 1 /* 0x80ff0000 */, atPixels)) {
 
 #ifndef QT_NO_DEBUG
 					m_plusImage->save(FolderUtils::getTopLevelUserDataStorePath() + QString("/collidePlus%1_%2.png").arg(viewLayerPlacement).arg(index));
