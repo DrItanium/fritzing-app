@@ -106,8 +106,8 @@ protected:
 	ItemBase * m_board;
 	double m_keepout;
     std::unique_ptr<QImage> m_plusImage;
-	QImage * m_minusImage;
-	QImage * m_displayImage;
+    std::unique_ptr<QImage> m_minusImage;
+    std::unique_ptr<QImage> m_displayImage;
 	QGraphicsPixmapItem * m_displayItem;
 	QHash<ViewLayer::ViewLayerPlacement, QDomDocument *> m_masterDocs;
 	bool m_cancelled;

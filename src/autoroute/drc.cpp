@@ -241,12 +241,6 @@ DRC::~DRC()
 	if (m_displayItem) {
 		delete m_displayItem;
 	}
-	if (m_minusImage) {
-		delete m_minusImage;
-	}
-	if (m_displayImage) {
-		delete m_displayImage;
-	}
 	foreach (QDomDocument * doc, m_masterDocs) {
 		delete doc;
 	}
@@ -352,10 +346,10 @@ bool DRC::startAux(QString & message, QStringList & messages, QList<CollidingThi
     m_plusImage = std::make_unique<QImage>(imgSize, QImage::Format_Mono);
 	m_plusImage->fill(0xffffffff);
 
-	m_minusImage = new QImage(imgSize, QImage::Format_Mono);
+    m_minusImage = std::make_unique<QImage>(imgSize, QImage::Format_Mono);
 	m_minusImage->fill(0);
 
-	m_displayImage = new QImage(imgSize, QImage::Format_Indexed8);
+    m_displayImage = std::make_unique<QImage>(imgSize, QImage::Format_Indexed8);
 	m_displayImage->setColor(0, 0);
 	m_displayImage->setColor(1, 0x80ff0000);
 	m_displayImage->setColor(2, 0xffffff00);
