@@ -108,6 +108,8 @@ protected:
     std::unique_ptr<QImage> m_plusImage;
     std::unique_ptr<QImage> m_minusImage;
     std::unique_ptr<QImage> m_displayImage;
+    // @todo can't make m_displayItem a unique_ptr because it is added to a
+    // scene graph outside the control of this class.
 	QGraphicsPixmapItem * m_displayItem;
 	QHash<ViewLayer::ViewLayerPlacement, QDomDocument *> m_masterDocs;
 	bool m_cancelled;
