@@ -35,6 +35,8 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include "../svg/svgfilesplitter.h"
 #include "../viewlayer.h"
 
+#include <memory>
+
 struct CollidingThing {
 	QPointer<class NonConnectorItem> nonConnectorItem;
 	QList<QPointF> atPixels;
@@ -103,7 +105,7 @@ protected:
 	PCBSketchWidget * m_sketchWidget;
 	ItemBase * m_board;
 	double m_keepout;
-	QImage * m_plusImage;
+    std::unique_ptr<QImage> m_plusImage;
 	QImage * m_minusImage;
 	QImage * m_displayImage;
 	QGraphicsPixmapItem * m_displayItem;

@@ -227,7 +227,6 @@ DRC::DRC(PCBSketchWidget * sketchWidget, ItemBase * board) :
     m_sketchWidget(sketchWidget),
     m_board(board),
     m_keepout(0.0),
-    m_plusImage(nullptr),
     m_minusImage(nullptr),
     m_displayImage(nullptr),
     m_displayItem(nullptr),
@@ -241,9 +240,6 @@ DRC::~DRC()
 {
 	if (m_displayItem) {
 		delete m_displayItem;
-	}
-	if (m_plusImage) {
-		delete m_plusImage;
 	}
 	if (m_minusImage) {
 		delete m_minusImage;
@@ -353,7 +349,7 @@ bool DRC::startAux(QString & message, QStringList & messages, QList<CollidingThi
 
 	QSize imgSize(qCeil(sourceRes.width()), qCeil(sourceRes.height()));
 
-	m_plusImage = new QImage(imgSize, QImage::Format_Mono);
+    m_plusImage = std::make_unique<QImage>(imgSize, QImage::Format_Mono);
 	m_plusImage->fill(0xffffffff);
 
 	m_minusImage = new QImage(imgSize, QImage::Format_Mono);
