@@ -60,10 +60,10 @@ public:
 	void setNewPartVisible(ItemBase *);
 	void setClipEnds(class ClipableWire *, bool);
 	void showGroundTraces(QList<ConnectorItem *> & seeds, bool show);
-	virtual double getLabelFontSizeTiny();
-	virtual double getLabelFontSizeSmall();
-	virtual double getLabelFontSizeMedium();
-	virtual double getLabelFontSizeLarge();
+	double getLabelFontSizeTiny() override;
+	double getLabelFontSizeSmall() override;
+	double getLabelFontSizeMedium() override;
+	double getLabelFontSizeLarge() override;
 	ViewLayer::ViewLayerID getWireViewLayerID(const ViewGeometry & viewGeometry, ViewLayer::ViewLayerPlacement);
 	QList<ItemBase *> findBoard();
 	ItemBase * findSelectedBoard(int & boardCount);

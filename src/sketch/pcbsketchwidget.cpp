@@ -66,8 +66,8 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 
 /////////////////////////////////////////////////////
 
-static const int MAX_INT = std::numeric_limits<int>::max();
-static const double StrokeWidthIncrement = 50;
+static constexpr int MAX_INT = std::numeric_limits<int>::max();
+static constexpr double StrokeWidthIncrement = 50;
 
 static QString PCBTraceColor1 = "trace1";
 static QString PCBTraceColor = "trace";
@@ -93,8 +93,8 @@ bool distanceLessThan(ConnectorItem * end0, ConnectorItem * end1) {
 		return false;
 	}
 
-	DistanceThing * dt0 = distances.value(end0, NULL);
-	DistanceThing * dt1 = distances.value(end1, NULL);
+	DistanceThing * dt0 = distances.value(end0, nullptr);
+	DistanceThing * dt1 = distances.value(end1, nullptr);
 	if (dt0 && dt1) {
 		return dt0->distance <= dt1->distance;
 	}
@@ -115,20 +115,20 @@ bool distanceLessThan(ConnectorItem * end0, ConnectorItem * end1) {
 const char * PCBSketchWidget::FakeTraceProperty = "FakeTrace";
 
 PCBSketchWidget::PCBSketchWidget(ViewLayer::ViewID viewID, QWidget *parent)
-	: SketchWidget(viewID, parent)
+	: SketchWidget(viewID, parent),
+    m_rolloverQuoteDialog(nullptr),
+    m_resizingBoard(nullptr),
+    m_resizingJumperItem(nullptr),
+    m_cleanType(noClean)
 {
-	m_rolloverQuoteDialog = NULL;
 	m_requestQuoteTimer.setSingleShot(true);
 	m_requestQuoteTimer.setInterval(100);
 	connect(&m_requestQuoteTimer, SIGNAL(timeout()), this, SLOT(requestQuoteNow()));
-	m_resizingBoard = NULL;
-	m_resizingJumperItem = NULL;
 	m_viewName = QObject::tr("PCB View");
 	m_shortName = QObject::tr("pcb");
 	initBackgroundColor();
 
 	m_routingStatus.zero();
-	m_cleanType = noClean;
 }
 
 void PCBSketchWidget::setWireVisible(Wire * wire)
@@ -198,7 +198,7 @@ ViewLayer::ViewLayerID PCBSketchWidget::multiLayerGetViewLayerID(ModelPart * mod
 bool PCBSketchWidget::canDeleteItem(QGraphicsItem * item, int count)
 {
 	VirtualWire * wire = dynamic_cast<VirtualWire *>(item);
-	if (wire != NULL && count > 1) return false;
+	if (wire && count > 1) return false;
 
 	return SketchWidget::canDeleteItem(item, count);
 }
@@ -206,7 +206,7 @@ bool PCBSketchWidget::canDeleteItem(QGraphicsItem * item, int count)
 bool PCBSketchWidget::canCopyItem(QGraphicsItem * item, int count)
 {
 	VirtualWire * wire = dynamic_cast<VirtualWire *>(item);
-	if (wire != NULL) {
+	if (wire) {
 		if (wire->getRatsnest()) return false;
 	}
 
@@ -219,10 +219,10 @@ bool PCBSketchWidget::canChainWire(Wire * wire) {
 
 	if (wire->getRatsnest()) {
 		ConnectorItem * c0 = wire->connector0()->firstConnectedToIsh();
-		if (c0 == NULL) return false;
+		if (!c0) return false;
 
 		ConnectorItem * c1 = wire->connector1()->firstConnectedToIsh();
-		if (c1 == NULL) return false;
+		if (!c1) return false;
 
 		return !c0->wiredTo(c1, (ViewGeometry::NormalFlag | ViewGeometry::PCBTraceFlag | ViewGeometry::RatsnestFlag | ViewGeometry::SchematicTraceFlag) ^ getTraceFlag());
 	}
@@ -290,7 +290,7 @@ void PCBSketchWidget::selectAllXTraces(bool autoroutable, const QString & cmdTex
 			                      tr("Your sketch does not have a board yet! Please add a PCB in order to use this selection operation."));
 			return;
 		}
-		if (board == NULL) {
+		if (!board) {
 			QMessageBox::critical(this, tr("Fritzing"),
 			                      tr("Please click on a PCB first--this selection operation only works for one board at a time."));
 			return;
@@ -303,7 +303,7 @@ void PCBSketchWidget::selectAllXTraces(bool autoroutable, const QString & cmdTex
 	}
 	foreach (QGraphicsItem * item, items) {
 		TraceWire * wire = dynamic_cast<TraceWire *>(item);
-		if (wire == NULL) continue;
+		if (!wire) continue;
 
 		if (!wire->isTraceType(getTraceFlag())) continue;
 
@@ -343,7 +343,7 @@ void PCBSketchWidget::addDefaultParts() {
 	viewGeometry.setLoc(QPointF(0, 0));
 
 	// have to put this off until later, because positioning the item doesn't work correctly until the view is visible
-	m_addedDefaultPart = addItem(referenceModel()->retrieveModelPart(ModuleIDNames::TwoSidedRectanglePCBModuleIDName), ViewLayer::NewTop, BaseCommand::CrossView, viewGeometry, newID, -1, NULL);
+	m_addedDefaultPart = addItem(referenceModel()->retrieveModelPart(ModuleIDNames::TwoSidedRectanglePCBModuleIDName), ViewLayer::NewTop, BaseCommand::CrossView, viewGeometry, newID, -1, nullptr);
 	m_addDefaultParts = true;
 
 	changeBoardLayers(2, true);
@@ -356,7 +356,7 @@ void PCBSketchWidget::showEvent(QShowEvent * event) {
 
 void PCBSketchWidget::dealWithDefaultParts() {
 	if (!m_addDefaultParts) return;
-	if  (m_addedDefaultPart == NULL) return;
+	if (!m_addedDefaultPart) return;
 
 	m_addDefaultParts = false;
 
@@ -557,21 +557,20 @@ bool PCBSketchWidget::bothEndsConnectedAux(Wire * wire, ViewGeometry::WireFlags 
 	return result;
 }
 
-bool PCBSketchWidget::canCreateWire(Wire * dragWire, ConnectorItem * from, ConnectorItem * to)
+bool PCBSketchWidget::canCreateWire(Wire * /*dragWire*/, ConnectorItem * from, ConnectorItem * to)
 {
-	Q_UNUSED(dragWire);
-	return ((from != NULL) && (to != NULL));
+	return (from && to);
 }
 
 ConnectorItem * PCBSketchWidget::findNearestPartConnectorItem(ConnectorItem * fromConnectorItem) {
 	// find the nearest part to fromConnectorItem
 	Wire * wire = qobject_cast<Wire *>(fromConnectorItem->attachedTo());
-	if (wire == NULL) return NULL;
+	if (!wire) return nullptr;
 
 	QList<ConnectorItem *> ends;
 	calcDistances(wire, ends);
 	clearDistances();
-	if (ends.count() < 1) return NULL;
+	if (ends.count() < 1) return nullptr;
 
 	return ends[0];
 }
@@ -600,7 +599,7 @@ void PCBSketchWidget::calcDistances(Wire * wire, QList<ConnectorItem *> & ends) 
 
 void PCBSketchWidget::clearDistances() {
 	foreach (ConnectorItem * c, distances.keys()) {
-		DistanceThing * dt = distances.value(c, NULL);
+		DistanceThing * dt = distances.value(c, nullptr);
 		if (dt) delete dt;
 	}
 	distances.clear();
@@ -658,7 +657,7 @@ void PCBSketchWidget::showGroundTraces(QList<ConnectorItem *> & connectorItems, 
 
 	foreach (ConnectorItem * connectorItem, connectorItems) {
 		TraceWire * trace = dynamic_cast<TraceWire *>(connectorItem->attachedTo());
-		if (trace == NULL) continue;
+		if (!trace) continue;
 
 		if (!trace->isTraceType(getTraceFlag())) continue;
 
@@ -713,7 +712,7 @@ void PCBSketchWidget::resizeBoard(double mmW, double mmH, bool doEmit)
 	Q_UNUSED(doEmit);
 
 	PaletteItem * item = getSelectedPart();
-	if (item == NULL) return;
+	if (!item) return;
 
 	bool handle = false;
 	switch (item->itemType()) {
@@ -739,7 +738,7 @@ void PCBSketchWidget::showLabelFirstTime(long itemID, bool show, bool doEmit) {
 	// called when new item is added, to decide whether to show part label
 	SketchWidget::showLabelFirstTime(itemID, show, doEmit);
 	ItemBase * itemBase = findItem(itemID);
-	if (itemBase == NULL) return;
+	if (!itemBase) return;
 	if (!canDropModelPart(itemBase->modelPart())) return;
 
 	switch (itemBase->itemType()) {
@@ -762,22 +761,22 @@ void PCBSketchWidget::showLabelFirstTime(long itemID, bool show, bool doEmit) {
 ItemBase * PCBSketchWidget::findBoardBeneath(ItemBase * itemBase) {
 	foreach (QGraphicsItem * item, scene()->collidingItems(itemBase)) {
 		Board * board = dynamic_cast<Board *>(item);
-		if (board == NULL) continue;
+		if (!board) continue;
 
 		if (Board::isBoard(board)) return board;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 ItemBase * PCBSketchWidget::findSelectedBoard(int & boardCount) {
 	QList<ItemBase *> boards = findBoard();
 	boardCount = boards.count();
-	if (boards.count() == 0) return NULL;
+	if (boards.count() == 0) return nullptr;
 	if (boards.count() == 1) return boards.at(0);
 
 	int selectedCount = 0;
-	ItemBase * selectedBoard = NULL;
+	ItemBase * selectedBoard = nullptr;
 	foreach (ItemBase * board, boards) {
 		if (board->isSelected()) {
 			selectedCount++;
@@ -786,14 +785,14 @@ ItemBase * PCBSketchWidget::findSelectedBoard(int & boardCount) {
 	}
 
 	if (selectedCount == 1) return selectedBoard;
-	return NULL;
+	return nullptr;
 }
 
 QList<ItemBase *> PCBSketchWidget::findBoard() {
 	QSet<ItemBase *> boards;
 	foreach (QGraphicsItem * childItem, items()) {
 		Board * board = dynamic_cast<Board *>(childItem);
-		if (board == NULL) continue;
+		if (!board) continue;
 
 		if (Board::isBoard(board)) {
 			boards.insert(board->layerKinChief());
@@ -831,7 +830,7 @@ void PCBSketchWidget::setBoardLayers(int layers, bool redraw) {
 	QList <ViewLayer::ViewLayerID> viewLayerIDs;
 	viewLayerIDs << ViewLayer::Copper1 << ViewLayer::Copper1Trace;
 	foreach (ViewLayer::ViewLayerID viewLayerID, viewLayerIDs) {
-		ViewLayer * layer = m_viewLayers.value(viewLayerID, NULL);
+		ViewLayer * layer = m_viewLayers.value(viewLayerID, nullptr);
 		if (layer) {
 			layer->action()->setEnabled(layers == 2);
 			layer->setVisible(layers == 2);
@@ -866,7 +865,7 @@ void PCBSketchWidget::swapLayers(ItemBase *, int newLayers, QUndoCommand * paren
 	// disconnect and flip smds
 	foreach (QGraphicsItem * item, scene()->items()) {
 		ItemBase * smd = dynamic_cast<ItemBase *>(item);
-		if (smd == NULL) continue;
+		if (!smd) continue;
 		if (smd->moduleID().endsWith(ModuleIDNames::PadModuleIDName)) {
 			pads << smd;
 			continue;
@@ -880,7 +879,7 @@ void PCBSketchWidget::swapLayers(ItemBase *, int newLayers, QUndoCommand * paren
 		smds.append(smd);
 	}
 
-	changeTraceLayer(NULL, true, changeBoardCommand);
+	changeTraceLayer(nullptr, true, changeBoardCommand);
 
 	foreach (ItemBase * smd, smds) {
 		long newID;
@@ -889,7 +888,7 @@ void PCBSketchWidget::swapLayers(ItemBase *, int newLayers, QUndoCommand * paren
 
 	foreach (ItemBase * itemBase, pads) {
 		Pad * pad = qobject_cast<Pad *>(itemBase);
-		if (pad == NULL) continue;
+		if (!pad) continue;
 
 		long newID;
 		emit subSwapSignal(this, pad,
@@ -913,7 +912,7 @@ bool PCBSketchWidget::isBoardLayerChange(ItemBase * itemBase, const QString & ne
 	}
 
 	ModelPart * modelPart = referenceModel()->retrieveModelPart(newModuleID);
-	if (modelPart == NULL) {
+	if (!modelPart) {
 		// shouldn't happen
 		return false;
 	}
@@ -949,7 +948,7 @@ void PCBSketchWidget::loadFromModelParts(QList<ModelPart *> & modelParts, BaseCo
         bool offsetPaste, const QRectF * boundingRect, bool seekOutsideConnections, QList<long> & newIDs) {
 
 	int layers = 1;
-	if (parentCommand == NULL) {
+	if (!parentCommand) {
 		foreach (ModelPart * modelPart, modelParts) {
 			if (Board::isBoard(modelPart)) {
 				QString slayers = modelPart->localProp("layers").toString();
@@ -995,7 +994,7 @@ void PCBSketchWidget::loadFromModelParts(QList<ModelPart *> & modelParts, BaseCo
 
 	SketchWidget::loadFromModelParts(modelParts, crossViewType, parentCommand, offsetPaste, boundingRect, seekOutsideConnections, newIDs);
 
-	if (parentCommand == NULL) {
+	if (!parentCommand) {
 		changeBoardLayers(layers, true);
 		shiftHoles();
 	}
@@ -1035,14 +1034,14 @@ bool PCBSketchWidget::sameElectricalLayer2(ViewLayer::ViewLayerID id1, ViewLayer
 void PCBSketchWidget::changeTraceLayer(ItemBase * itemBase, bool force, QUndoCommand * parentCommand) {
 	QList<Wire *> visitedWires;
 	QSet<Wire *> changeWires;
-	TraceWire * sample = NULL;
+	TraceWire * sample = nullptr;
 	QList<QGraphicsItem *> items;
-	if (itemBase != NULL) items << itemBase;
+	if (itemBase) items << itemBase;
 	else if (force) items = scene()->items();
 	else items =  scene()->selectedItems();
 	foreach (QGraphicsItem * item, items) {
 		TraceWire * tw = dynamic_cast<TraceWire *>(item);
-		if (tw == NULL) continue;
+		if (!tw) continue;
 
 		if (!tw->isTraceType(getTraceFlag())) continue;
 		if (visitedWires.contains(tw)) continue;
@@ -1057,7 +1056,7 @@ void PCBSketchWidget::changeTraceLayer(ItemBase * itemBase, bool force, QUndoCom
 		if (!force) {
 			bool canChange = true;
 			foreach(ConnectorItem * end, ends) {
-				if (end->getCrossLayerConnectorItem() == NULL) {
+				if (!end->getCrossLayerConnectorItem()) {
 					canChange = false;
 					break;
 				}
@@ -1068,10 +1067,10 @@ void PCBSketchWidget::changeTraceLayer(ItemBase * itemBase, bool force, QUndoCom
 		changeWires.insert(tw);
 	}
 
-	if (changeWires.count() == 0 || sample == NULL) return;
+	if (changeWires.count() == 0 || !sample) return;
 
 	bool createNew = false;
-	if (parentCommand == NULL) {
+	if (!parentCommand) {
 		parentCommand = new QUndoCommand(tr("Change trace layer"));
 		createNew = true;
 	}
@@ -1089,10 +1088,10 @@ void PCBSketchWidget::changeTraceLayer(ItemBase * itemBase, bool force, QUndoCom
 		// probably safest to disconnect change the layers and reconnect, so that's why the redundant looping
 
 		foreach (ConnectorItem * end, ends) {
-			ConnectorItem * targetConnectorItem = NULL;
+			ConnectorItem * targetConnectorItem = nullptr;
 			foreach (ConnectorItem * toConnectorItem, end->connectedToItems()) {
 				Wire * w = qobject_cast<Wire *>(toConnectorItem->attachedTo());
-				if (w == NULL) continue;
+				if (!w) continue;
 
 				if (wires.contains(w)) {
 					targetConnectorItem = toConnectorItem;
@@ -1111,10 +1110,10 @@ void PCBSketchWidget::changeTraceLayer(ItemBase * itemBase, bool force, QUndoCom
 		}
 
 		foreach (ConnectorItem * end, ends) {
-			ConnectorItem * targetConnectorItem = NULL;
+			ConnectorItem * targetConnectorItem = nullptr;
 			foreach (ConnectorItem * toConnectorItem, end->connectedToItems()) {
 				Wire * w = qobject_cast<Wire *>(toConnectorItem->attachedTo());
-				if (w == NULL) continue;
+				if (!w) continue;
 
 				if (wires.contains(w)) {
 					targetConnectorItem = toConnectorItem;
@@ -1137,14 +1136,14 @@ void PCBSketchWidget::changeTraceLayer(ItemBase * itemBase, bool force, QUndoCom
 
 void PCBSketchWidget::changeLayer(long id, double z, ViewLayer::ViewLayerID viewLayerID) {
 	ItemBase * itemBase = findItem(id);
-	if (itemBase == NULL) return;
+	if (!itemBase) return;
 
 	itemBase->setViewLayerID(viewLayerID, m_viewLayers);
 	itemBase->setZValue(z);
 	itemBase->saveGeometry();
 
 	TraceWire * tw = qobject_cast<TraceWire *>(itemBase);
-	if (tw != NULL) {
+	if (tw) {
 		ViewLayer::ViewLayerPlacement viewLayerPlacement = ViewLayer::specFromID(viewLayerID);
 		tw->setViewLayerPlacement(viewLayerPlacement);
 		tw->setColorString(traceColor(viewLayerPlacement), 1.0, true);
@@ -1158,10 +1157,10 @@ void PCBSketchWidget::changeLayer(long id, double z, ViewLayer::ViewLayerID view
 }
 
 bool PCBSketchWidget::resizingJumperItemPress(ItemBase * itemBase) {
-	if (itemBase == NULL) return false;
+	if (!itemBase) return false;
 
 	JumperItem * jumperItem = qobject_cast<JumperItem *>(itemBase->layerKinChief());
-	if (jumperItem == NULL) return false;
+	if (!jumperItem) return false;
 	if (!jumperItem->inDrag()) return false;
 
 	m_resizingJumperItem = jumperItem;
@@ -1171,10 +1170,10 @@ bool PCBSketchWidget::resizingJumperItemPress(ItemBase * itemBase) {
 		ItemBase * board = findBoardBeneath(m_resizingJumperItem);
 		QHash<long, ItemBase *> savedItems;
 		QHash<Wire *, ConnectorItem *> savedWires;
-		if (board == NULL) {
+		if (!board) {
 			foreach (QGraphicsItem * item, scene()->items()) {
 				PaletteItemBase * itemBase = dynamic_cast<PaletteItemBase *>(item);
-				if (itemBase == NULL) continue;
+				if (!itemBase) continue;
 				if (itemBase->itemType() == ModelPart::Jumper) continue;
 
 				savedItems.insert(itemBase->layerKinChief()->id(), itemBase);
@@ -1199,7 +1198,7 @@ void PCBSketchWidget::alignJumperItem(JumperItem * jumperItem, QPointF & loc) {
 }
 
 bool PCBSketchWidget::resizingJumperItemRelease() {
-	if (m_resizingJumperItem == NULL) return false;
+	if (!m_resizingJumperItem) return false;
 
 	if (m_alignToGrid) {
 		disconnect(m_resizingJumperItem, SIGNAL(alignMe(JumperItem *, QPointF &)), this, SLOT(alignJumperItem(JumperItem *, QPointF &)));
@@ -1216,14 +1215,14 @@ void PCBSketchWidget::resizeJumperItem() {
 	QPointF newPos;
 	m_resizingJumperItem->saveParams();
 	m_resizingJumperItem->getParams(newPos, newC0, newC1);
-	QUndoCommand * cmd = new ResizeJumperItemCommand(this, m_resizingJumperItem->id(), oldPos, oldC0, oldC1, newPos, newC0, newC1, NULL);
+	QUndoCommand * cmd = new ResizeJumperItemCommand(this, m_resizingJumperItem->id(), oldPos, oldC0, oldC1, newPos, newC0, newC1, nullptr);
 	cmd->setText("Resize Jumper");
 	m_undoStack->waitPush(cmd, 10);
-	m_resizingJumperItem = NULL;
+	m_resizingJumperItem = nullptr;
 }
 
 bool PCBSketchWidget::canDragWire(Wire * wire) {
-	if (wire == NULL) return false;
+	if (!wire) return false;
 
 	if (wire->getRatsnest()) return false;
 
@@ -1245,7 +1244,7 @@ ItemBase * PCBSketchWidget::addCopperLogoItem(ViewLayer::ViewLayerPlacement view
 	ViewGeometry viewGeometry;
 	viewGeometry.setLoc(QPointF(0, 0));
 	QString moduleID = (viewLayerPlacement == ViewLayer::NewBottom) ? ModuleIDNames::Copper0LogoTextModuleIDName : ModuleIDNames::Copper1LogoTextModuleIDName;
-	return addItem(referenceModel()->retrieveModelPart(moduleID), viewLayerPlacement, BaseCommand::SingleView, viewGeometry, newID, -1, NULL);
+	return addItem(referenceModel()->retrieveModelPart(moduleID), viewLayerPlacement, BaseCommand::SingleView, viewGeometry, newID, -1, nullptr);
 }
 
 bool PCBSketchWidget::hasAnyNets() {
@@ -1257,7 +1256,7 @@ QSizeF PCBSketchWidget::jumperItemSize() {
 		long newID = ItemBase::getNextID();
 		ViewGeometry viewGeometry;
 		viewGeometry.setLoc(QPointF(0, 0));
-		ItemBase * itemBase = addItem(referenceModel()->retrieveModelPart(ModuleIDNames::JumperModuleIDName), ViewLayer::NewTop, BaseCommand::SingleView, viewGeometry, newID, -1, NULL);
+		ItemBase * itemBase = addItem(referenceModel()->retrieveModelPart(ModuleIDNames::JumperModuleIDName), ViewLayer::NewTop, BaseCommand::SingleView, viewGeometry, newID, -1, nullptr);
 		if (itemBase) {
 			JumperItem * jumperItem = qobject_cast<JumperItem *>(itemBase);
 			m_jumperItemSize = jumperItem->connector0()->rect().size();
@@ -1302,7 +1301,7 @@ bool PCBSketchWidget::acceptsTrace(const ViewGeometry & viewGeometry) {
 ItemBase * PCBSketchWidget::placePartDroppedInOtherView(ModelPart * modelPart, ViewLayer::ViewLayerPlacement viewLayerPlacement, const ViewGeometry & viewGeometry, long id, SketchWidget * dropOrigin)
 {
 	ItemBase * newItem = SketchWidget::placePartDroppedInOtherView(modelPart, viewLayerPlacement, viewGeometry, id, dropOrigin);
-	if (newItem == NULL) return newItem;
+	if (!newItem) return newItem;
 	if (!newItem->isEverVisible()) return newItem;
 
 	dealWithDefaultParts();
@@ -1312,7 +1311,7 @@ ItemBase * PCBSketchWidget::placePartDroppedInOtherView(ModelPart * modelPart, V
 		boards = findBoard();
 	}
 	else {
-		boards << NULL;
+		boards << nullptr;
 	}
 
 	foreach (ItemBase * board, boards) {
@@ -1328,7 +1327,7 @@ ItemBase * PCBSketchWidget::placePartDroppedInOtherView(ModelPart * modelPart, V
 
 		foreach (QGraphicsItem * item, (board) ? scene()->collidingItems(board) : scene()->items()) {
 			ItemBase * itemBase = dynamic_cast<ItemBase *>(item);
-			if (itemBase == NULL) continue;
+			if (!itemBase) continue;
 			if (!itemBase->isEverVisible()) continue;
 			if (itemBase->layerKinChief() != itemBase) continue;
 
@@ -1336,7 +1335,7 @@ ItemBase * PCBSketchWidget::placePartDroppedInOtherView(ModelPart * modelPart, V
 			if (itemBase->layerKinChief() == newItem) continue;
 
 			Wire * wire = qobject_cast<Wire *>(itemBase);
-			if (wire != NULL) {
+			if (wire) {
 				if (!wire->getTrace()) continue;
 				if (!wire->isTraceType(getTraceFlag())) continue;
 			}
@@ -1344,7 +1343,7 @@ ItemBase * PCBSketchWidget::placePartDroppedInOtherView(ModelPart * modelPart, V
 
 			// itemBase->debugInfo("tiling");
 			QRectF r = itemBase->sceneBoundingRect().adjusted(-keepout, -keepout, keepout, keepout);
-			router.insertTile(plane, r, alreadyTiled, NULL, Tile::OBSTACLE, CMRouter::IgnoreAllOverlaps);
+			router.insertTile(plane, r, alreadyTiled, nullptr, Tile::OBSTACLE, CMRouter::IgnoreAllOverlaps);
 		}
 
 		BestPlace bestPlace;
@@ -1354,8 +1353,8 @@ ItemBase * PCBSketchWidget::placePartDroppedInOtherView(ModelPart * modelPart, V
 		bestPlace.height = realToTile(newItem->boundingRect().height());
 		bestPlace.plane = plane;
 
-		TiSrArea(NULL, plane, &bestPlace.maxRect, Panelizer::placeBestFit, &bestPlace);
-		if (bestPlace.bestTile != NULL) {
+		TiSrArea(nullptr, plane, &bestPlace.maxRect, Panelizer::placeBestFit, &bestPlace);
+		if (bestPlace.bestTile) {
 			QRectF r;
 			tileToQRect(bestPlace.bestTile, r);
 			ItemBase * chief = newItem->layerKinChief();
@@ -1367,7 +1366,7 @@ ItemBase * PCBSketchWidget::placePartDroppedInOtherView(ModelPart * modelPart, V
 			alignOneToGrid(newItem);
 		}
 		router.drcClean();
-		if (bestPlace.bestTile != NULL) {
+		if (bestPlace.bestTile) {
 			break;
 		}
 	}
@@ -1461,7 +1460,7 @@ double PCBSketchWidget::getSmallerTraceWidth(double minDim) {
 
 bool PCBSketchWidget::groundFill(bool fillGroundTraces, ViewLayer::ViewLayerID viewLayerID, QUndoCommand * parentCommand)
 {
-	m_groundFillSeeds = NULL;
+	m_groundFillSeeds = nullptr;
 	int boardCount;
 	ItemBase * board = findSelectedBoard(boardCount);
 	// barf an error if there's no board
@@ -1470,7 +1469,7 @@ bool PCBSketchWidget::groundFill(bool fillGroundTraces, ViewLayer::ViewLayerID v
 		                      tr("Your sketch does not have a board yet!  Please add a PCB in order to use copper fill."));
 		return false;
 	}
-	if (board == NULL) {
+	if (!board) {
 		QMessageBox::critical(this, tr("Fritzing"),
 		                      tr("%1 Fill: please select the board you want to apply fill to.").arg(fillGroundTraces ? tr("Ground") : tr("Copper")));
 		return false;
@@ -1622,7 +1621,7 @@ QString PCBSketchWidget::generateCopperFillUnit(ItemBase * itemBase, QPointF whe
 		                      tr("Your sketch does not have a board yet!  Please add a PCB in order to use copper fill."));
 		return "";
 	}
-	if (board == NULL) {
+	if (!board) {
 		QMessageBox::critical(this, tr("Fritzing"),
 		                      tr("Copper fill: please select only the board you want to fill."));
 		return "";
@@ -1702,7 +1701,7 @@ bool PCBSketchWidget::connectorItemHasSpec(ConnectorItem * connectorItem, ViewLa
 	if (ViewLayer::specFromID(connectorItem->attachedToViewLayerID()) == spec)  return true;
 
 	connectorItem = connectorItem->getCrossLayerConnectorItem();
-	if (connectorItem == NULL) return false;
+	if (!connectorItem) return false;
 
 	return (ViewLayer::specFromID(connectorItem->attachedToViewLayerID()) == spec);
 }
@@ -1744,7 +1743,7 @@ Wire * PCBSketchWidget::createTempWireForDragging(Wire * fromWire, ModelPart * w
 	}
 	viewGeometry.setPCBTrace(true);
 	Wire * wire =  SketchWidget::createTempWireForDragging(fromWire, wireModel, connectorItem, viewGeometry, spec);
-	if (fromWire == NULL) {
+	if (!fromWire) {
 		wire->setColorString(traceColor(connectorItem), 1.0, false);
 		double traceWidth = getTraceWidth();
 		double minDim = connectorItem->minDimension();
@@ -1792,7 +1791,7 @@ void PCBSketchWidget::rotatePartLabels(double degrees, QTransform & transform, Q
 
 	foreach (QGraphicsItem * item, scene()->items()) {
 		PartLabel * partLabel = dynamic_cast<PartLabel *>(item);
-		if (partLabel == NULL) continue;
+		if (!partLabel) continue;
 		if (!partLabel->isVisible()) continue;
 		//if (!bbr.intersects(partLabel->sceneBoundingRect())) continue;  // if the part is on the board and the label is off the board, this does not rotate
 		if (!savedValues.contains(partLabel->owner()->layerKinChief())) continue;
@@ -1811,11 +1810,11 @@ QString PCBSketchWidget::characterizeGroundFill(ViewLayer::ViewLayerID whichGrou
 	QString result = GroundPlane::fillTypeNone;
 	bool gotOne = false;
 
-	int boardCount;
+	int boardCount = 0;
 	ItemBase * board = findSelectedBoard(boardCount);
 	foreach (QGraphicsItem * item, scene()->collidingItems(board)) {
 		GroundPlane * gp = dynamic_cast<GroundPlane *>(item);
-		if (gp == NULL) continue;
+		if (!gp) continue;
 
 		if (gp->viewLayerID() == whichGroundPlane) {
 			gotOne = true;
@@ -1828,7 +1827,7 @@ QString PCBSketchWidget::characterizeGroundFill(ViewLayer::ViewLayerID whichGrou
 
 	foreach (QGraphicsItem * item, scene()->items()) {
 		GroundPlane * gp = dynamic_cast<GroundPlane *>(item);
-		if (gp == NULL) continue;
+		if (!gp) continue;
 		if (gp->viewLayerID() != whichGroundPlane) continue;
 
 		QString fillType = gp->prop("fillType");
@@ -1896,7 +1895,7 @@ bool PCBSketchWidget::canConnectSeed(QRectF boardRect,
 
 void PCBSketchWidget::postImageSlot(GroundPlaneGenerator * gpg, QImage * copperImage, QImage * boardImage, QGraphicsItem * board, QList<QRectF> * rects) {
 
-	if (m_groundFillSeeds == nullptr) return;
+	if (!m_groundFillSeeds) return;
 
 	ViewLayer::ViewLayerID viewLayerID = (gpg->layerName() == "groundplane") ? ViewLayer::Copper0 : ViewLayer::Copper1;
 
@@ -1980,7 +1979,7 @@ bool PCBSketchWidget::hasNeighbor(ConnectorItem * connectorItem, ViewLayer::View
 {
 	foreach (QGraphicsItem * item, scene()->items(r)) {
 		ConnectorItem * ci = dynamic_cast<ConnectorItem *>(item);
-		if (ci != nullptr) {
+		if (ci) {
 			if (ci->attachedToViewLayerID() != viewLayerID) continue;
 			if (!ci->attachedTo()->isEverVisible()) continue;
 			if (ci == connectorItem) continue;
@@ -1989,7 +1988,7 @@ bool PCBSketchWidget::hasNeighbor(ConnectorItem * connectorItem, ViewLayer::View
 		}
 
 		TraceWire * traceWire = dynamic_cast<TraceWire *>(item);
-		if (traceWire != nullptr) {
+		if (traceWire) {
 			if (!sameElectricalLayer2(traceWire->viewLayerID(), viewLayerID)) continue;
 			if (!traceWire->isTraceType(getTraceFlag())) continue;
 
@@ -2004,7 +2003,7 @@ void PCBSketchWidget::collectThroughHole(QList<ConnectorItem *> & th, QList<Conn
 {
 	foreach (QGraphicsItem * item, scene()->items()) {
 		ConnectorItem * connectorItem = dynamic_cast<ConnectorItem *>(item);
-		if (connectorItem == NULL) continue;
+		if (!connectorItem) continue;
 		if (!connectorItem->attachedTo()->isVisible()) continue;
 		if (!layerList.contains(connectorItem->attachedToViewLayerID())) continue;
 		if (connectorItem->attachedTo()->moduleID().endsWith(ModuleIDNames::PadModuleIDName)) {
@@ -2057,11 +2056,11 @@ void PCBSketchWidget::clearGroundFillSeeds()
 
 	int boardCount;
 	ItemBase * board = findSelectedBoard(boardCount);
-	if (board == NULL) return;
+	if (!board) return;
 
 	foreach (QGraphicsItem * item, scene()->collidingItems(board)) {
 		ConnectorItem * connectorItem = dynamic_cast<ConnectorItem *>(item);
-		if (connectorItem == NULL) continue;
+		if (!connectorItem) continue;
 		if (connectorItem->attachedToItemType() == ModelPart::CopperFill) continue;
 
 		if (connectorItem->isGroundFillSeed()) {
@@ -2072,7 +2071,7 @@ void PCBSketchWidget::clearGroundFillSeeds()
 
 	if (trueSeeds.count() == 0) return;
 
-	GroundFillSeedCommand * command = new GroundFillSeedCommand(this, NULL);
+	GroundFillSeedCommand * command = new GroundFillSeedCommand(this, nullptr);
 	command->setText(tr("Clear ground fill seeds"));
 	foreach (ConnectorItem * connectorItem, trueSeeds) {
 		command->addItem(connectorItem->attachedToID(), connectorItem->connectorSharedID(), false);
@@ -2091,10 +2090,10 @@ void PCBSketchWidget::setGroundFillSeeds(const QString & intro)
 {
 	QList<ConnectorItem *> seeds;
 	collectGroundFillSeeds(seeds, true);
-	GroundFillSeedDialog gfsd(this, seeds, intro, NULL);
+	GroundFillSeedDialog gfsd(this, seeds, intro, nullptr);
 	int result = gfsd.exec();
 	if (result == QDialog::Accepted) {
-		GroundFillSeedCommand * command = NULL;
+		GroundFillSeedCommand * command = nullptr;
 		QList<bool> results;
 		gfsd.getResults(results);
 		bool checked = false;
@@ -2103,8 +2102,8 @@ void PCBSketchWidget::setGroundFillSeeds(const QString & intro)
 			bool isSeed = results.at(i);
 			checked |= isSeed;
 			if (isSeed != ci->isGroundFillSeed()) {
-				if (command == NULL) {
-					command = new GroundFillSeedCommand(this, NULL);
+				if (!command) {
+					command = new GroundFillSeedCommand(this, nullptr);
 				}
 				command->addItem(ci->attachedToID(), ci->connectorSharedID(), isSeed);
 			}
@@ -2124,13 +2123,13 @@ bool PCBSketchWidget::collectGroundFillSeeds(QList<ConnectorItem *> & seeds, boo
 	QList<ConnectorItem *> trueSeeds;
 	QList<ConnectorItem *> potentialSeeds;
 
-	int boardCount;
+	int boardCount = 0;
 	ItemBase * board = findSelectedBoard(boardCount);
-	if (board == NULL) return false;
+	if (!board) return false;
 
 	foreach (QGraphicsItem * item, scene()->collidingItems(board)) {
 		ConnectorItem * connectorItem = dynamic_cast<ConnectorItem *>(item);
-		if (connectorItem == NULL) continue;
+		if (!connectorItem) continue;
 		if (connectorItem->attachedToItemType() == ModelPart::CopperFill) continue;
 
 		if (connectorItem->isGroundFillSeed()) {
@@ -2187,7 +2186,7 @@ void PCBSketchWidget::shiftHoles() {
 
 	foreach (QGraphicsItem * item, scene()->items()) {
 		ItemBase * itemBase = dynamic_cast<ItemBase *>(item);
-		if (itemBase == NULL) continue;
+		if (!itemBase) continue;
 
 		switch (itemBase->itemType()) {
 		case ModelPart::Via:
@@ -2203,7 +2202,7 @@ void PCBSketchWidget::shiftHoles() {
 
 bool PCBSketchWidget::canAlignToCenter(ItemBase * itemBase)
 {
-	return qobject_cast<Hole *>(itemBase) != NULL;
+	return qobject_cast<Hole *>(itemBase);
 }
 
 int PCBSketchWidget::selectAllItemType(ModelPart::ItemType itemType, const QString & typeName)
@@ -2215,16 +2214,16 @@ int PCBSketchWidget::selectAllItemType(ModelPart::ItemType itemType, const QStri
 		                      tr("Your sketch does not have a board yet!  Please add a PCB in order to use this selection operation."));
 		return 0;
 	}
-	if (board == NULL) {
+	if (!board) {
 		QMessageBox::critical(this, tr("Fritzing"),
 		                      tr("Please click on a PCB first--this selection operation only works for one board at a time."));
 		return 0;
 	}
 
 	QSet<ItemBase *> itemBases;
-	foreach (QGraphicsItem * item, (board == NULL ? scene()->items() : scene()->collidingItems(board))) {
+	foreach (QGraphicsItem * item, (!board ? scene()->items() : scene()->collidingItems(board))) {
 		ItemBase * itemBase = dynamic_cast<ItemBase *>(item);
-		if (itemBase == NULL) continue;
+		if (!itemBase) continue;
 		if (itemBase->itemType() != itemType) continue;
 
 		itemBases.insert(itemBase->layerKinChief());
@@ -2243,7 +2242,7 @@ void PCBSketchWidget::selectAllWires(ViewGeometry::WireFlag flag)
 		                      tr("Your sketch does not have a board yet!  Please add a PCB in order to use this selection operation."));
 		return;
 	}
-	if (board == NULL) {
+	if (!board) {
 		QMessageBox::critical(this, tr("Fritzing"),
 		                      tr("Please click on a PCB first--this selection operation only works for one board at a time."));
 		return;
@@ -2254,7 +2253,7 @@ void PCBSketchWidget::selectAllWires(ViewGeometry::WireFlag flag)
 }
 
 ViewLayer::ViewLayerPlacement PCBSketchWidget::defaultViewLayerPlacement(ModelPart * modelPart) {
-	if (modelPart == NULL || boardLayers() == 2) return SketchWidget::defaultViewLayerPlacement(modelPart);
+	if (!modelPart || boardLayers() == 2) return SketchWidget::defaultViewLayerPlacement(modelPart);
 
 	if (modelPart->flippedSMD()) return ViewLayer::NewBottom;
 	if (modelPart->moduleID() == ModuleIDNames::GroundPlaneModuleIDName) return ViewLayer::NewBottom;
@@ -2290,7 +2289,7 @@ QString PCBSketchWidget::checkDroppedModuleID(const QString & moduleID) {
 
 void PCBSketchWidget::convertToVia(ConnectorItem * lastHoverEnterConnectorItem) {
 	Wire * wire = qobject_cast<Wire *>(lastHoverEnterConnectorItem->attachedTo());
-	if (wire == NULL) return;
+	if (!wire) return;
 
 	this->clearHoldingSelectItem();
 	this->m_moveEventCount = 0;  // clear this so an extra MoveItemCommand isn't posted
@@ -2302,7 +2301,7 @@ void PCBSketchWidget::convertToVia(ConnectorItem * lastHoverEnterConnectorItem) 
 
 	double ringThickness, holeSize;
 	getViaSize(ringThickness, holeSize);
-	QPointF p = lastHoverEnterConnectorItem->sceneAdjustedTerminalPoint(NULL);
+	QPointF p = lastHoverEnterConnectorItem->sceneAdjustedTerminalPoint(nullptr);
 	double d = ringThickness + (holeSize / 2) + Via::OffsetPixels;
 	QPointF loc(p.x() - d, p.y() - d);
 	long newID = ItemBase::getNextID();
@@ -2316,7 +2315,7 @@ void PCBSketchWidget::convertToVia(ConnectorItem * lastHoverEnterConnectorItem) 
 		ConnectorItem * from = connectorItems.at(i);
 		foreach (ConnectorItem * to, from->connectedToItems()) {
 			Wire * w = qobject_cast<Wire *>(to->attachedTo());
-			if (w != NULL && w->isTraceType(getTraceFlag())) {
+			if (w && w->isTraceType(getTraceFlag())) {
 				if (!connectorItems.contains(to)) {
 					connectorItems.append(to);
 				}
@@ -2328,7 +2327,7 @@ void PCBSketchWidget::convertToVia(ConnectorItem * lastHoverEnterConnectorItem) 
 	foreach (ConnectorItem * from, connectorItems) {
 		foreach (ConnectorItem * to, from->connectedToItems()) {
 			Wire * w = qobject_cast<Wire *>(to->attachedTo());
-			if (w != NULL && w->isTraceType(getTraceFlag())) {
+			if (w && w->isTraceType(getTraceFlag())) {
 				new ChangeConnectionCommand(this, BaseCommand::CrossView, from->attachedToID(), from->connectorSharedID(),
 				                            to->attachedToID(), to->connectorSharedID(),
 				                            ViewLayer::specFromID(w->viewLayerID()),
@@ -2357,17 +2356,17 @@ void PCBSketchWidget::convertToVia(ConnectorItem * lastHoverEnterConnectorItem) 
 
 void PCBSketchWidget::convertToBendpoint() {
 
-	ItemBase * itemBase = NULL;
+	ItemBase * itemBase = nullptr;
 	foreach (QGraphicsItem * item,  scene()->selectedItems()) {
 		ItemBase * candidate = dynamic_cast<ItemBase *>(item);
-		if (candidate == NULL) continue;
+		if (!candidate) continue;
 
-		if (itemBase == NULL) itemBase = candidate->layerKinChief();
+		if (!itemBase) itemBase = candidate->layerKinChief();
 		else if (candidate->layerKinChief() != itemBase) return;
 	}
 
 	Via * via = dynamic_cast<Via *>(itemBase);
-	if (via == NULL) return;
+	if (!via) return;
 
 	QList<ConnectorItem *> viaConnectorItems;
 	viaConnectorItems << via->connectorItem();
@@ -2384,7 +2383,7 @@ void PCBSketchWidget::convertToBendpoint() {
 	foreach (ConnectorItem * viaConnectorItem, viaConnectorItems) {
 		foreach (ConnectorItem * connectorItem, viaConnectorItem->connectedToItems()) {
 			Wire * wire = qobject_cast<Wire *>(connectorItem->attachedTo());
-			if (wire == NULL) continue;
+			if (!wire) continue;
 			if (wire->getRatsnest()) continue;
 			if (!wire->isTraceType(getTraceFlag())) continue;
 
@@ -2405,7 +2404,7 @@ void PCBSketchWidget::convertToBendpoint() {
 			QList<ConnectorItem *> ends;
 			wire->collectChained(wires, ends);
 			foreach (ConnectorItem * end, ends) {
-				if (end->getCrossLayerConnectorItem() == NULL) {
+				if (!end->getCrossLayerConnectorItem()) {
 					if (ViewLayer::copperLayers(ViewLayer::NewTop).contains(end->attachedToViewLayerID())) {
 						copper1Only = true;
 					}
@@ -2558,7 +2557,7 @@ int PCBSketchWidget::checkLoadedTraces() {
 	QHash<Wire *, QLineF> lines;
 	foreach (QGraphicsItem * item, scene()->items()) {
 		Wire * wire = dynamic_cast<Wire *>(item);
-		if (wire == NULL) continue;
+		if (!wire) continue;
 		if (!wire->isTraceType(getTraceFlag())) continue;
 
 		ConnectorItem * c0 = wire->connector0();
@@ -2661,16 +2660,16 @@ void PCBSketchWidget::setAutorouterSettings(QHash<QString, QString> & autorouter
 
 void PCBSketchWidget::hidePartSilkscreen() {
 
-	ItemBase * itemBase = NULL;
+	ItemBase * itemBase = nullptr;
 	foreach (QGraphicsItem * item,  scene()->selectedItems()) {
 		ItemBase * candidate = dynamic_cast<ItemBase *>(item);
-		if (candidate == NULL) continue;
+		if (!candidate) continue;
 
 		itemBase = candidate->layerKinChief();
 		break;
 	}
 
-	if (itemBase == NULL) return;
+	if (!itemBase) return;
 
 	QList<ItemBase *> itemBases;
 	itemBases.append(itemBase);
@@ -2709,7 +2708,7 @@ void PCBSketchWidget::fabQuote() {
 
 	m_quoteDialog->exec();
 	delete m_quoteDialog;
-	m_quoteDialog = NULL;
+	m_quoteDialog = nullptr;
 }
 
 void PCBSketchWidget::gotFabQuote(QNetworkReply * networkReply) {
@@ -2806,12 +2805,12 @@ void PCBSketchWidget::requestQuoteNow() {
 
 ItemBase * PCBSketchWidget::resizeBoard(long itemID, double mmW, double mmH) {
 	ItemBase * itemBase = SketchWidget::resizeBoard(itemID, mmW, mmH);
-	if (itemBase != NULL && Board::isBoard(itemBase)) requestQuoteSoon();
+	if (itemBase && Board::isBoard(itemBase)) requestQuoteSoon();
 	return itemBase;
 }
 
 QDialog * PCBSketchWidget::quoteDialog(QWidget * parent) {
-	if (m_rolloverQuoteDialog == NULL) {
+	if (!m_rolloverQuoteDialog) {
 		m_rolloverQuoteDialog = new QuoteDialog(false, parent);
 		requestQuote(false);
 	}
@@ -2865,10 +2864,10 @@ void PCBSketchWidget::setViewFromBelow(bool viewFromBelow) {
 	QSet<ItemBase *> chiefs;
 	foreach (QGraphicsItem * item, scene()->items()) {
 		ItemBase * itemBase = dynamic_cast<ItemBase *>(item);
-		if (itemBase == NULL) continue;
+		if (!itemBase) continue;
 
-		ViewLayer * viewLayer = m_viewLayers.value(itemBase->viewLayerID(), NULL);
-		if (viewLayer == NULL) continue;
+		ViewLayer * viewLayer = m_viewLayers.value(itemBase->viewLayerID(), nullptr);
+		if (!viewLayer) continue;
 
 		double newZ = viewLayer->getZFromBelow(itemBase->z(), viewFromBelow);
 		itemBase->setZValue(newZ);
