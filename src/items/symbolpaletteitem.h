@@ -91,11 +91,11 @@ protected:
 	void resetLayerKin();
 
 protected:
-	double m_voltage;
+	double m_voltage = 0.0;
 	QPointer<ConnectorItem> m_connector0;
 	QPointer<ConnectorItem> m_connector1;
-	bool m_voltageReference;
-	bool m_isNetLabel;
+	bool m_voltageReference = false;
+	bool m_isNetLabel = false;
 };
 
 

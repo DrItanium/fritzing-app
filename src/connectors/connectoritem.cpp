@@ -1582,7 +1582,7 @@ bool ConnectorItem::isGrounded(ConnectorItem * c1, ConnectorItem * c2) {
 	return false;
 }
 
-bool ConnectorItem::isGrounded() {
+bool ConnectorItem::isGrounded() const {
 	QString name = connectorSharedName();
 	return ((name.compare("gnd", Qt::CaseInsensitive) == 0) ||
 	        // (name.compare("-", Qt::CaseInsensitive) == 0) ||

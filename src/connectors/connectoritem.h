@@ -96,7 +96,8 @@ public:
 	void restoreColor(QList<ConnectorItem *> & visited);
 	void showEqualPotential(bool show, QList<ConnectorItem *> & visited);
 	void setHoverColor();
-	bool isGrounded();
+    /// @todo figure out how to specify a list of ground titles
+	bool isGrounded() const;
 	ConnectorItem * chooseFromSpec(ViewLayer::ViewLayerPlacement);
 	bool connectedToWires();
 	bool isCrossLayerConnectorItem(ConnectorItem * candidate);
