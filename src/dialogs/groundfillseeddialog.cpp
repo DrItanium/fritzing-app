@@ -32,7 +32,7 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 GroundFillSeedDialog::GroundFillSeedDialog(PCBSketchWidget * sketchWidget, QList<class ConnectorItem *> & connectorItems, const QString & intro, QWidget *parent)
 	: QDialog(parent),
     m_sketchWidget(sketchWidget),
-    m_connectorItems(connectorItems),
+    m_connectorItems(connectorItems)
 {
 	this->setWindowTitle(QObject::tr("Ground Fill Seed Editor"));
 

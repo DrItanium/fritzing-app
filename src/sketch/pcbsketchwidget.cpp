@@ -117,10 +117,10 @@ const char * PCBSketchWidget::FakeTraceProperty = "FakeTrace";
 PCBSketchWidget::PCBSketchWidget(ViewLayer::ViewID viewID, QWidget *parent)
 	: SketchWidget(viewID, parent),
     m_rolloverQuoteDialog(nullptr),
-    m_resizingBoard(nullptr),
     m_resizingJumperItem(nullptr),
     m_cleanType(noClean)
 {
+    m_resizingBoard = nullptr;
 	m_requestQuoteTimer.setSingleShot(true);
 	m_requestQuoteTimer.setInterval(100);
 	connect(&m_requestQuoteTimer, SIGNAL(timeout()), this, SLOT(requestQuoteNow()));

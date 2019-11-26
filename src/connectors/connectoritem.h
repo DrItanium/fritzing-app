@@ -97,7 +97,7 @@ public:
 	void showEqualPotential(bool show, QList<ConnectorItem *> & visited);
 	void setHoverColor();
     /// @todo figure out how to specify a list of ground titles
-	bool isGrounded() const;
+	bool isGrounded();
 	ConnectorItem * chooseFromSpec(ViewLayer::ViewLayerPlacement);
 	bool connectedToWires();
 	bool isCrossLayerConnectorItem(ConnectorItem * candidate);
