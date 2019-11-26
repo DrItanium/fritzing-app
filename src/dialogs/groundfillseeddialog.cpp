@@ -30,13 +30,10 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////
 
 GroundFillSeedDialog::GroundFillSeedDialog(PCBSketchWidget * sketchWidget, QList<class ConnectorItem *> & connectorItems, const QString & intro, QWidget *parent)
-	: QDialog(parent)
+	: QDialog(parent),
+    m_sketchWidget(sketchWidget),
+    m_connectorItems(connectorItems),
 {
-	m_sketchWidget = sketchWidget;
-	m_connectorItems = connectorItems;
-    m_activeConnectorItem = nullptr;
-	m_doFill = false;
-
 	this->setWindowTitle(QObject::tr("Ground Fill Seed Editor"));
 
 	QVBoxLayout * vLayout = new QVBoxLayout(this);
@@ -47,18 +44,18 @@ GroundFillSeedDialog::GroundFillSeedDialog(PCBSketchWidget * sketchWidget, QList
 		vLayout->addWidget(label);
 	}
 
-	QLabel * label = new QLabel(tr("The difference between a 'ground fill' and plain 'copper fill' is that in a ground fill, "
-	                               "the flooded area includes traces and connectors that are connected to 'ground' connectors. "
-	                               "Ground connectors are usually labeled 'GND' or 'ground' but sometimes this is not the case. "
-	                               "It also may be that there are multiple nets with a ground connector, "
-	                               "and you might only want one of the nets to be filled.\n\n"
+	auto label = new QLabel(tr("The difference between a 'ground fill' and plain 'copper fill' is that in a ground fill, "
+	                           "the flooded area includes traces and connectors that are connected to 'ground' connectors. "
+	                           "Ground connectors are usually labeled 'GND' or 'ground' but sometimes this is not the case. "
+	                           "It also may be that there are multiple nets with a ground connector, "
+	                           "and you might only want one of the nets to be filled.\n\n"
 
-	                               "This dialog collects only connectors labeled 'GND' or 'ground', as well as connectors already chosen as seeds.\n\n"
+	                           "This dialog collects only connectors labeled 'GND' or 'ground', as well as connectors already chosen as seeds.\n\n"
 
-	                               "Click an item to highlight its connections in the sketch.\n\n"
+	                           "Click an item to highlight its connections in the sketch.\n\n"
 
-	                               "It is also possible to choose a connector as a ground fill seed by right-clicking a connector and "
-	                               "choosing the 'Set Ground Fill Seed' context menu option."));
+	                           "It is also possible to choose a connector as a ground fill seed by right-clicking a connector and "
+	                           "choosing the 'Set Ground Fill Seed' context menu option."));
 	label->setWordWrap(true);
 	vLayout->addWidget(label);
 
@@ -105,10 +102,6 @@ GroundFillSeedDialog::GroundFillSeedDialog(PCBSketchWidget * sketchWidget, QList
             break;
         }
     }
-}
-
-GroundFillSeedDialog::~GroundFillSeedDialog()
-{
 }
 
 void GroundFillSeedDialog::changedSlot(QListWidgetItem *) {

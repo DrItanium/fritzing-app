@@ -34,7 +34,7 @@ class GroundFillSeedDialog : public QDialog
 
 public:
 	GroundFillSeedDialog(class PCBSketchWidget *, QList<class ConnectorItem *> &, const QString & intro, QWidget *parent = 0);
-	~GroundFillSeedDialog();
+	~GroundFillSeedDialog() = default;
 
 	void getResults(QList<bool> & results);
 	bool getFill();
@@ -50,12 +50,12 @@ protected:
 	void showEqualPotential(ConnectorItem * connectorItem, bool show);
 
 protected:
-	PCBSketchWidget * m_sketchWidget;
+	PCBSketchWidget * m_sketchWidget = nullptr;
 	QList<ConnectorItem *> m_connectorItems;
-	QListWidget * m_listWidget;
-	ConnectorItem * m_activeConnectorItem;
-	bool m_doFill;
-	QPushButton * m_doFillButton;
+	QListWidget * m_listWidget = nullptr;
+	ConnectorItem * m_activeConnectorItem = nullptr;
+	bool m_doFill = false;
+	QPushButton * m_doFillButton = nullptr;
 
 };
 
