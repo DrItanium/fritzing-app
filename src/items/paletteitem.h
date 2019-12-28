@@ -73,7 +73,7 @@ class PaletteItem : public PaletteItemBase
 public:
 	// after calling this constructor if you want to render the loaded svg (either from model or from file), MUST call <renderImage>
 	PaletteItem(ModelPart *, ViewLayer::ViewID, const ViewGeometry & viewGeometry, long id, QMenu * itemMenu, bool doLabel);
-	~PaletteItem();
+	~PaletteItem() override;
 
 	void removeLayerKin();
 	void addLayerKin(class LayerKinPaletteItem * lkpi);

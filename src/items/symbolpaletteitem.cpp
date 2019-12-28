@@ -98,8 +98,6 @@ SymbolPaletteItem::SymbolPaletteItem( ModelPart * modelPart, ViewLayer::ViewID v
 		Voltages.append(12.0);
 	}
 
-	m_connector0 = m_connector1 = NULL;
-	m_voltage = 0;
 	m_voltageReference = (modelPart->properties().value("type").compare("voltage reference") == 0);
 
 	if (modelPart->moduleID().endsWith(ModuleIDNames::NetLabelModuleIDName)) {
@@ -135,13 +133,13 @@ SymbolPaletteItem::~SymbolPaletteItem() {
 			if (m_connector1) {
 				LocalNetLabels.remove(key, m_connector1);
 			}
-			LocalNetLabels.remove(key, NULL);		// cleans null QPointers
+			LocalNetLabels.remove(key, nullptr);		// cleans null QPointers
 		}
 	}
 	else {
 		if (m_connector0) LocalGrounds.removeOne(m_connector0);
 		if (m_connector1) LocalGrounds.removeOne(m_connector1);
-		LocalGrounds.removeOne(NULL);   // cleans null QPointers
+		LocalGrounds.removeOne(nullptr);   // cleans null QPointers
 
 		foreach (long key, LocalVoltages.uniqueKeys()) {
 			if (m_connector0) {
@@ -150,7 +148,7 @@ SymbolPaletteItem::~SymbolPaletteItem() {
 			if (m_connector1) {
 				LocalVoltages.remove(key, m_connector1);
 			}
-			LocalVoltages.remove(key, NULL);		// cleans null QPointers
+			LocalVoltages.remove(key, nullptr);		// cleans null QPointers
 		}
 	}
 }
@@ -167,7 +165,7 @@ void SymbolPaletteItem::removeMeFromBus(double v) {
 
 				bool gotOne = LocalGrounds.removeOne(connectorItem);
 				int count = LocalVoltages.remove(fromVoltage(v), connectorItem);
-				LocalVoltages.remove(fromVoltage(v), NULL);
+				LocalVoltages.remove(fromVoltage(v), nullptr);
 
 
 				if (count == 0 && !gotOne) {
@@ -179,17 +177,19 @@ void SymbolPaletteItem::removeMeFromBus(double v) {
 			}
 		}
 	}
-	LocalGrounds.removeOne(NULL);  // keep cleaning these out
+	LocalGrounds.removeOne(nullptr);  // keep cleaning these out
 }
 
 ConnectorItem* SymbolPaletteItem::newConnectorItem(Connector *connector)
 {
 	ConnectorItem * connectorItem = PaletteItemBase::newConnectorItem(connector);
-
-	if (connector->connectorSharedID().compare("connector0") == 0) {
+    auto connectorIs = [connector](const QString& name) noexcept {
+        return connector->connectorSharedID().compare(name) == 0;
+    };
+    if (connectorIs("connector0")) {
 		m_connector0 = connectorItem;
 	}
-	else if (connector->connectorSharedID().compare("connector1") == 0) {
+	else if (connectorIs("connector1")) {
 		m_connector1 = connectorItem;
 	}
 	else {
@@ -211,7 +211,7 @@ ConnectorItem* SymbolPaletteItem::newConnectorItem(Connector *connector)
 }
 
 void SymbolPaletteItem::busConnectorItems(Bus * bus, ConnectorItem * fromConnectorItem, QList<class ConnectorItem *> & items) {
-	if (bus == NULL) return;
+	if (!bus) return;
 
 	PaletteItem::busConnectorItems(bus, fromConnectorItem, items);
 
@@ -230,7 +230,7 @@ void SymbolPaletteItem::busConnectorItems(Bus * bus, ConnectorItem * fromConnect
 		mitems.append(LocalVoltages.values(fromVoltage(m_voltage)));
 	}
 	foreach (ConnectorItem * connectorItem, mitems) {
-		if (connectorItem == NULL) continue;
+		if (!connectorItem) continue;
 
 		if (connectorItem->scene() == this->scene()) {
 			items.append(connectorItem);
@@ -244,11 +244,14 @@ double SymbolPaletteItem::voltage() {
 }
 
 void SymbolPaletteItem::setProp(const QString & prop, const QString & value) {
-	if (prop.compare("voltage", Qt::CaseInsensitive) == 0) {
+    auto propIs = [prop](const QString& name) noexcept {
+        return prop.compare(name, Qt::CaseInsensitive) == 0;
+    };
+    if (propIs("voltage")) {
 		setVoltage(value.toDouble());
 		return;
 	}
-	if (prop.compare("label", Qt::CaseInsensitive) == 0 && m_isNetLabel) {
+	if (propIs("label") && m_isNetLabel) {
 		setLabel(value);
 		return;
 	}
@@ -270,7 +273,7 @@ void SymbolPaletteItem::setLabel(const QString & label) {
 	QString svg = makeSvg(this->viewLayerID());
 	resetRenderer(svg);
 	resetLayerKin();
-	resetConnectors(NULL, NULL);
+	resetConnectors(nullptr, nullptr);
 
 	retransform(transform);
 }
@@ -355,14 +358,6 @@ double SymbolPaletteItem::useVoltage(ConnectorItem * connectorItem) {
 	return (connectorItem->connectorSharedName().compare("GND", Qt::CaseInsensitive) == 0) ? 0 : m_voltage;
 }
 
-ConnectorItem * SymbolPaletteItem::connector0() {
-	return m_connector0;
-}
-
-ConnectorItem * SymbolPaletteItem::connector1() {
-	return m_connector1;
-}
-
 void SymbolPaletteItem::addedToScene(bool temporary)
 {
 	if (this->scene()) {
@@ -400,7 +395,7 @@ bool SymbolPaletteItem::collectExtraInfo(QWidget * parent, const QString & famil
 			if (v == m_voltage) {
 				edit->setCurrentIndex(ix);
 			}
-			ix++;
+            ++ix;
 		}
 
 		QDoubleValidator * validator = new QDoubleValidator(edit);
@@ -441,14 +436,14 @@ bool SymbolPaletteItem::collectExtraInfo(QWidget * parent, const QString & famil
 
 void SymbolPaletteItem::voltageEntry(const QString & text) {
 	InfoGraphicsView * infoGraphicsView = InfoGraphicsView::getInfoGraphicsView(this);
-	if (infoGraphicsView != NULL) {
+	if (infoGraphicsView) {
 		infoGraphicsView->setVoltage(text.toDouble(), true);
 	}
 }
 
 void SymbolPaletteItem::labelEntry() {
 	QLineEdit * edit = qobject_cast<QLineEdit *>(sender());
-	if (edit == NULL) return;
+	if (!edit) return;
 
 	QString current = getLabel();
 	if (edit->text().compare(current) == 0) return;
@@ -459,7 +454,7 @@ void SymbolPaletteItem::labelEntry() {
 	}
 
 	InfoGraphicsView * infoGraphicsView = InfoGraphicsView::getInfoGraphicsView(this);
-	if (infoGraphicsView != NULL) {
+	if (infoGraphicsView) {
 		infoGraphicsView->setProp(this, "label", ItemBase::TranslatedPropertyNames.value("label"), current, edit->text(), true);
 	}
 }
@@ -548,15 +543,12 @@ NetLabel::NetLabel( ModelPart * modelPart, ViewLayer::ViewID viewID, const ViewG
 	}
 }
 
-NetLabel::~NetLabel() {
-}
-
 QString NetLabel::makeSvg(ViewLayer::ViewLayerID viewLayerID) {
 
 	DebugDialog::debug("moduleid " + this->moduleID());
 	double divisor = moduleID().contains(PartFactory::OldSchematicPrefix) ? 1 : 3;
 
-	double labelFontSize = 200 /divisor;
+	double labelFontSize = 200 / divisor;
 	double totalHeight = 300 / divisor;
 	double arrowWidth = totalHeight / 2;
 	double strokeWidth = 10 / divisor;
@@ -626,7 +618,7 @@ QString NetLabel::makeSvg(ViewLayer::ViewLayerID viewLayerID) {
 
 void NetLabel::addedToScene(bool temporary)
 {
-	if (this->scene() && m_viewID == ViewLayer::SchematicView) {
+	if (this->scene() && inSchematicView()) {
 		// do not understand why plan setLabel() doesn't work the same as the Mystery Part setChipLabel() in addedToScene()
 
 		if (!this->transform().isIdentity()) {
@@ -640,8 +632,9 @@ void NetLabel::addedToScene(bool temporary)
 
 
 			QTransform chiefTransform = this->transform();
-			QTransform local;
-			local.setMatrix(chiefTransform.m11(), chiefTransform.m12(), chiefTransform.m13(), chiefTransform.m21(), chiefTransform.m22(), chiefTransform.m23(), 0, 0, chiefTransform.m33());
+			QTransform local(chiefTransform.m11(), chiefTransform.m12(), chiefTransform.m13(),
+							 chiefTransform.m21(), chiefTransform.m22(), chiefTransform.m23(),
+							 0,                    0,                    chiefTransform.m33());
 			if (!local.isIdentity()) {
 				double x = r.width() / 2.0;
 				double y = r.height() / 2.0;
@@ -662,28 +655,18 @@ void NetLabel::addedToScene(bool temporary)
 	return PaletteItem::addedToScene(temporary);
 }
 
-QString NetLabel::retrieveSvg(ViewLayer::ViewLayerID viewLayerID, QHash<QString, QString> & svgHash, bool blackOnly, double dpi, double & factor) {
-	Q_UNUSED(svgHash);
+QString NetLabel::retrieveSvg(ViewLayer::ViewLayerID viewLayerID, QHash<QString, QString> & /* svgHash */, bool blackOnly, double dpi, double & factor) {
 	QString svg = makeSvg(viewLayerID);
 	return PaletteItemBase::normalizeSvg(svg, viewLayerID, blackOnly, dpi, factor);
 }
 
-ItemBase::PluralType NetLabel::isPlural() {
-	return Plural;
-}
-
-bool NetLabel::isOnlyNetLabel() {
-	return true;
-}
-
 QString NetLabel::getInspectorTitle() {
 	return getLabel();
-
 }
 
 void NetLabel::setInspectorTitle(const QString & oldText, const QString & newText) {
 	InfoGraphicsView * infoGraphicsView = InfoGraphicsView::getInfoGraphicsView(this);
-	if (infoGraphicsView == NULL) return;
+	if (!infoGraphicsView) return;
 
 	infoGraphicsView->setProp(this, "label", ItemBase::TranslatedPropertyNames.value("label"), oldText, newText, true);
 }

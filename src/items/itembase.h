@@ -326,6 +326,11 @@ protected:
 	void updateHidden();
 	void createShape(LayerAttributes & layerAttributes);
 
+public:
+    constexpr bool inPCBView() const noexcept { return m_viewID == ViewLayer::ViewID::PCBView; }
+    constexpr bool inBreadboardView() const noexcept { return m_viewID == ViewLayer::ViewID::BreadboardView; }
+    constexpr bool inSchematicView() const noexcept { return m_viewID == ViewLayer::ViewID::SchematicView; }
+
 protected:
 	static bool getFlipDoc(ModelPart * modelPart, const QString & filename, ViewLayer::ViewLayerID viewLayerID, ViewLayer::ViewLayerPlacement, QDomDocument &, Qt::Orientations);
 	static bool fixCopper1(ModelPart * modelPart, const QString & filename, ViewLayer::ViewLayerID viewLayerID, ViewLayer::ViewLayerPlacement, QDomDocument &);

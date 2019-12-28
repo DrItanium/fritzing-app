@@ -37,6 +37,7 @@ class PaletteItemBase : public ItemBase, public CursorKeyListener
 
 public:
 	PaletteItemBase(ModelPart *, ViewLayer::ViewID, const ViewGeometry & viewGeometry, long id, QMenu * itemMenu);
+    PaletteItemBase() override = default;
 
 	void saveGeometry();
 	bool itemMoved();

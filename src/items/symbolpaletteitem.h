@@ -52,7 +52,7 @@ class SymbolPaletteItem : public PaletteItem
 
 public:
 	SymbolPaletteItem(ModelPart *, ViewLayer::ViewID, const ViewGeometry & viewGeometry, long id, QMenu * itemMenu, bool doLabel);
-	~SymbolPaletteItem();
+	~SymbolPaletteItem() override;
 
 	ConnectorItem* newConnectorItem(class Connector *connector);
 	void busConnectorItems(class Bus * bus, ConnectorItem *, QList<ConnectorItem *> & items);
@@ -62,8 +62,8 @@ public:
 	QString retrieveSvg(ViewLayer::ViewLayerID, QHash<QString, QString> & svgHash, bool blackOnly, double dpi, double & factor);
 	bool collectExtraInfo(QWidget * parent, const QString & family, const QString & prop, const QString & value, bool swappingEnabled, QString & returnProp, QString & returnValue, QWidget * & returnWidget, bool & hide);
 	QString getProperty(const QString & key);
-	ConnectorItem * connector0();
-	ConnectorItem * connector1();
+	ConnectorItem * connector0() noexcept { return m_connector0; }
+	ConnectorItem * connector1() noexcept { return m_connector1; }
 	PluralType isPlural();
 	void addedToScene(bool temporary);
 	bool hasPartNumberProperty();
@@ -91,7 +91,7 @@ protected:
 	void resetLayerKin();
 
 protected:
-	double m_voltage;
+	double m_voltage = 0;
 	QPointer<ConnectorItem> m_connector0;
 	QPointer<ConnectorItem> m_connector1;
 	bool m_voltageReference;
@@ -105,13 +105,13 @@ class NetLabel : public SymbolPaletteItem
 
 public:
 	NetLabel(ModelPart *, ViewLayer::ViewID, const ViewGeometry & viewGeometry, long id, QMenu * itemMenu, bool doLabel);
-	~NetLabel();
+	~NetLabel() override = default;
 
-	void addedToScene(bool temporary);
-	QString retrieveSvg(ViewLayer::ViewLayerID, QHash<QString, QString> & svgHash, bool blackOnly, double dpi, double & factor);
-	PluralType isPlural();
-	bool isOnlyNetLabel();
-	QString getInspectorTitle();
+	void addedToScene(bool temporary) override;
+	QString retrieveSvg(ViewLayer::ViewLayerID, QHash<QString, QString> & svgHash, bool blackOnly, double dpi, double & factor) override;
+	PluralType isPlural() override { return Plural; }
+	constexpr bool isOnlyNetLabel() const noexcept { return true; }
+	QString getInspectorTitle() override;
 	void setInspectorTitle(const QString & oldText, const QString & newText);
 
 protected:
