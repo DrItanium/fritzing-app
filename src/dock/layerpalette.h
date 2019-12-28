@@ -42,7 +42,7 @@ public:
 	ViewLayer * viewLayer() const noexcept { return m_viewLayer; }
 
 protected:
-	ViewLayer * m_viewLayer;
+	ViewLayer * m_viewLayer = nullptr;
 };
 
 class LayerPalette : public QScrollArea
@@ -67,8 +67,8 @@ protected:
 	QVBoxLayout * m_mainLayout;
 	QGroupBox * m_groupBox;
 
-	QAction *m_showAllLayersAct;
-	QAction *m_hideAllLayersAct;
+	QAction *m_showAllLayersAct = nullptr;
+	QAction *m_hideAllLayersAct = nullptr;
 };
 
 #endif
