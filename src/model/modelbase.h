@@ -39,9 +39,9 @@ public:
 	bool loadFromFile(const QString & fileName, ModelBase* referenceModel, QList<ModelPart *> & modelParts, bool checkInstances);
 	void save(const QString & fileName, bool asPart);
 	void save(const QString & fileName, class QXmlStreamWriter &, bool asPart);
-	virtual ModelPart * addPart(QString newPartPath, bool addToReference);
-	virtual bool addPart(ModelPart * modelPart, bool update);
-	virtual ModelPart * addPart(QString newPartPath, bool addToReference, bool updateIdAlreadyExists);
+	virtual ModelPart * addPart(QString newPartPath, bool addToReference); /* = 0 */
+	virtual bool addPart(ModelPart * modelPart, bool update); /* = 0 */
+	virtual ModelPart * addPart(QString newPartPath, bool addToReference, bool updateIdAlreadyExists); /* = 0; */
 	bool paste(ModelBase * referenceModel, QByteArray & data, QList<ModelPart *> & modelParts, QHash<QString, QRectF> & boundingRects, bool preserveIndex);
 	void setReportMissingModules(bool);
 	ModelPart * genFZP(const QString & moduleID, ModelBase * referenceModel);

@@ -398,6 +398,21 @@ ModelPart * ModelBase::addModelPart(ModelPart * parent, ModelPart * copyChild) {
 	return modelPart;
 }
 
+ModelPart * ModelBase::addPart(QString /* newPartPath */, bool /* addToReference */) {
+	throw "ModelBase::addPart should not be invoked";
+}
+
+ModelPart * ModelBase::addPart(QString /* newPartPath */, bool /* addToReference */, bool /* updateIdAlreadyExists */)
+{
+	throw "ModelBase::addPart should not be invoked";
+}
+
+// TODO Mariano: this function should never get called. Make pure virtual
+bool ModelBase::addPart(ModelPart * /* modelPart */, bool /* update */) {
+	throw "ModelBase::addPart should not be invoked";
+}
+
+
 void ModelBase::save(const QString & fileName, bool asPart) {
 	QFileInfo info(fileName);
 	QDir dir = info.absoluteDir();
@@ -405,7 +420,7 @@ void ModelBase::save(const QString & fileName, bool asPart) {
 	QString temp = dir.absoluteFilePath("temp.xml");
 	QFile file1(temp);
 	if (!file1.open(QFile::WriteOnly | QFile::Text)) {
-		FMessageBox::warning(NULL, QObject::tr("Fritzing"),
+		FMessageBox::warning(nullptr, QObject::tr("Fritzing"),
 		                     QObject::tr("Cannot write file temp:\n%1\n%2\n%3.")
 		                     .arg(temp)
 		                     .arg(fileName)
@@ -421,7 +436,7 @@ void ModelBase::save(const QString & fileName, bool asPart) {
 	if(original.exists() && !original.remove()) {
 		file1.remove();
 		FMessageBox::warning(
-		    NULL,
+		    nullptr,
 		    tr("File save failed!"),
 		    tr("Couldn't overwrite file '%1'.\nReason: %2 (errcode %3)")
 		    .arg(fileName)
@@ -557,7 +572,7 @@ void ModelBase::setReportMissingModules(bool b) {
 
 ModelPart * ModelBase::genFZP(const QString & moduleID, ModelBase * referenceModel) {
 	QString path = PartFactory::getFzpFilename(moduleID);
-	if (path.isEmpty()) return NULL;
+	if (path.isEmpty()) return nullptr;
 
 	ModelPart* mp = referenceModel->addPart(path, true, true);
 	if (mp) mp->setCore(true);
@@ -565,7 +580,7 @@ ModelPart * ModelBase::genFZP(const QString & moduleID, ModelBase * referenceMod
 }
 
 ModelPartSharedRoot * ModelBase::rootModelPartShared() {
-	if (m_root == NULL) return NULL;
+	if (!m_root) return nullptr;
 
 	return m_root->modelPartSharedRoot();
 }
@@ -812,7 +827,7 @@ ModelPart * ModelBase::createOldSchematicPart(ModelPart * modelPart, QString & m
 
 ModelPart * ModelBase::createOldSchematicPartAux(ModelPart * modelPart, const QString & oldModuleIDRef, const QString & oldSchematicFileName, const QString & oldSvgPath)
 {
-	if (!QFile::exists(oldSvgPath)) return NULL;
+	if (!QFile::exists(oldSvgPath)) return nullptr;
 
 	// create oldModelPart, set up the new image file name, add it to refmodel
 	QFile newFzp(modelPart->path());
@@ -820,7 +835,7 @@ ModelPart * ModelBase::createOldSchematicPartAux(ModelPart * modelPart, const QS
 	bool ok = oldDoc.setContent(&newFzp);
 	if (!ok) {
 		// this shouldn't happen
-		return NULL;
+		return nullptr;
 	}
 
 	QDomElement root = oldDoc.documentElement();
@@ -830,7 +845,7 @@ ModelPart * ModelBase::createOldSchematicPartAux(ModelPart * modelPart, const QS
 	QDomElement layers = schematicView.firstChildElement("layers");
 	if (layers.isNull()) {
 		// this shouldn't happen
-		return NULL;
+		return nullptr;
 	}
 
 	layers.setAttribute("image", oldSchematicFileName);
@@ -838,7 +853,7 @@ ModelPart * ModelBase::createOldSchematicPartAux(ModelPart * modelPart, const QS
 	QString oldFzpPath = PartFactory::fzpPath() + oldModuleIDRef + ".fzp";
 	if (!TextUtils::writeUtf8(oldFzpPath, oldDoc.toString())) {
 		// this shouldn't happen
-		return NULL;
+		return nullptr;
 	}
 
 	ModelPart * oldModelPart = m_referenceModel->addPart(oldFzpPath, true, true);
