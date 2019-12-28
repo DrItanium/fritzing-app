@@ -35,7 +35,7 @@ class ZoomLabel : public QLabel {
 
 public:
 	ZoomLabel(QWidget * parent);
-	~ZoomLabel();
+	~ZoomLabel() = default;
 
 	void setImages(const QString & normal, const QString & pressed);
 	void setAutoRepeat(bool);

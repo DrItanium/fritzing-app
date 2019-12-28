@@ -59,10 +59,6 @@ ZoomLabel::ZoomLabel(QWidget * parent) : QLabel(parent)
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(repeat()));
 }
 
-ZoomLabel::~ZoomLabel()
-{
-}
-
 void ZoomLabel::setAutoRepeat(bool autoRepeat)
 {
 	m_autoRepeat = autoRepeat;
