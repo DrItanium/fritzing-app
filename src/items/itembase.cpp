@@ -139,9 +139,9 @@ static QHash<QString, QStringList> CachedValues;
 ItemBase::ItemBase( ModelPart* modelPart, ViewLayer::ViewID viewID, const ViewGeometry & viewGeometry, long id, QMenu * itemMenu )
 	: QGraphicsSvgItem(), 
 	m_id(id), 
-	m_itemMenu(itemMenu),
+	m_modelPart(modelPart),
 	m_viewID(viewID),
-	m_modelPart(modelPart)
+	m_itemMenu(itemMenu)
 {
 	//DebugDialog::debug(QString("itembase %1 %2").arg(id).arg((long) static_cast<QGraphicsItem *>(this), 0, 16));
 	if (m_modelPart) {
@@ -628,9 +628,7 @@ void ItemBase::hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ) {
 	}
 }
 
-void ItemBase::updateConnections(bool includeRatsnest, QList<ConnectorItem *> & already) {
-	Q_UNUSED(already)
-	Q_UNUSED(includeRatsnest);
+void ItemBase::updateConnections(bool /* includeRatsnest */, QList<ConnectorItem *> & /* already */) {
 }
 
 void ItemBase::updateConnections(ConnectorItem * connectorItem, bool includeRatsnest, QList<ConnectorItem *> & already) {
@@ -1060,11 +1058,7 @@ bool ItemBase::hasConnectors() {
 }
 
 bool ItemBase::hasNonConnectors() {
-	foreach (QGraphicsItem * childItem, childItems()) {
-		if (dynamic_cast<NonConnectorItem *>(childItem)) return true;
-	}
-
-	return false;
+	return childItemsAccept<NonConnectorItem>([](NonConnectorItem*) { return true; });
 }
 
 bool ItemBase::canFlip(Qt::Orientations orientations) {
@@ -1458,9 +1452,10 @@ FSvgRenderer * ItemBase::setUpImage(ModelPart * modelPart, LayerAttributes & lay
 
 void ItemBase::updateConnectionsAux(bool includeRatsnest, QList<ConnectorItem *> & already) {
 	//DebugDialog::debug("update connections");
-	foreach (ConnectorItem * connectorItem, cachedConnectorItems()) {
-		updateConnections(connectorItem, includeRatsnest, already);
-	}
+	cachedConnectorItemsAccept([this, includeRatsnest, &already](ConnectorItem* connectorItem) {
+				updateConnections(connectorItem, includeRatsnest, already);
+				return false;
+			});
 }
 
 void ItemBase::figureHover() {
@@ -1474,11 +1469,7 @@ QString ItemBase::retrieveSvg(ViewLayer::ViewLayerID /* viewLayerID */, QHash<QS
 
 bool ItemBase::hasConnections()
 {
-	foreach (ConnectorItem * connectorItem, cachedConnectorItems()) {
-		if (connectorItem->connectionsCount() > 0) return true;
-	}
-
-	return false;
+	return cachedConnectorItemsAccept([](ConnectorItem* item) { return item->connectionsCount() > 0; });
 }
 
 void ItemBase::getConnectedColor(ConnectorItem *, QBrush &brush, QPen &pen, double & opacity, double & negativePenWidth, bool & negativeOffsetRect) {
@@ -1595,13 +1586,13 @@ void ItemBase::setProp(const QString & prop, const QString & value) {
 
 QString ItemBase::prop(const QString & p)
 {
-	if (m_modelPart == nullptr) return "";
+	if (!m_modelPart) return "";
 
 	return m_modelPart->localProp(p).toString();
 }
 
 bool ItemBase::isObsolete() {
-	if (modelPart() == nullptr) return false;
+	if (!modelPart()) return false;
 
 	return modelPart()->isObsolete();
 }
@@ -1820,9 +1811,10 @@ void ItemBase::updateConnectors()
 	if (!isEverVisible()) return;
 
 	QList<ConnectorItem *> visited;
-	foreach(ConnectorItem * connectorItem, cachedConnectorItems()) {
-		connectorItem->restoreColor(visited);
-	}
+	cachedConnectorItemsAccept([&visited](ConnectorItem* item) {
+				item->restoreColor(visited);
+				return false;
+			});
 	//DebugDialog::debug(QString("set up connectors restore:%1").arg(count));
 }
 
@@ -1974,9 +1966,10 @@ void ItemBase::killRubberBandLeg() {
 
 	prepareGeometryChange();
 
-	foreach (ConnectorItem * connectorItem, cachedConnectorItems()) {
-		connectorItem->killRubberBandLeg();
-	}
+	cachedConnectorItemsAccept([](ConnectorItem* item) {
+				item->killRubberBandLeg();
+				return false;
+			});
 }
 
 ViewGeometry::WireFlags ItemBase::wireFlags() const {
@@ -1991,7 +1984,7 @@ QRectF ItemBase::boundingRectWithoutLegs() const
 QRectF ItemBase::boundingRect() const
 {
 	FSvgRenderer * frenderer = fsvgRenderer();
-	if (frenderer == nullptr) {
+	if (!frenderer) {
 		return QGraphicsSvgItem::boundingRect();
 	}
 
@@ -2029,7 +2022,7 @@ FSvgRenderer * ItemBase::fsvgRenderer() const {
 	if (m_fsvgRenderer) return m_fsvgRenderer;
 
 	FSvgRenderer * f = qobject_cast<FSvgRenderer *>(renderer());
-	if (f == nullptr) {
+	if (!f) {
 		DebugDialog::debug("shouldn't happen: missing fsvgRenderer");
 	}
 	return f;
@@ -2374,7 +2367,7 @@ void ItemBase::initLayerAttributes(LayerAttributes & layerAttributes, ViewLayer:
 	layerAttributes.doConnectors = doConnectors;
 	layerAttributes.createShape = doCreateShape;
 	InfoGraphicsView * infoGraphicsView = InfoGraphicsView::getInfoGraphicsView(this);
-	if (infoGraphicsView != nullptr) {
+	if (infoGraphicsView) {
 		layerAttributes.orientation = infoGraphicsView->smdOrientation();
 	}
 }
@@ -2384,7 +2377,7 @@ void ItemBase::showInFolder() {
 	if (!path.isEmpty()) {
 		FolderUtils::showInFolder(path);
 		QClipboard *clipboard = QApplication::clipboard();
-		if (clipboard != nullptr) {
+		if (clipboard) {
 			clipboard->setText(path);
 		}
 	}
@@ -2399,7 +2392,7 @@ QString ItemBase::getInspectorTitle() {
 
 void ItemBase::setInspectorTitle(const QString & oldText, const QString & newText) {
 	InfoGraphicsView * infoGraphicsView = InfoGraphicsView::getInfoGraphicsView(this);
-	if (infoGraphicsView == nullptr) return;
+	if (!infoGraphicsView) return;
 
 	DebugDialog::debug(QString("set instance title to %1").arg(newText));
 	infoGraphicsView->setInstanceTitle(id(), oldText, newText, true, false);
