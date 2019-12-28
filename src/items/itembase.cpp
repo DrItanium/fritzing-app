@@ -749,7 +749,7 @@ void ItemBase::busConnectorItems(class Bus * bus, ConnectorItem * fromConnectorI
 
 int ItemBase::itemType() const
 {
-	if (m_modelPart == nullptr) return ModelPart::Unknown;
+	if (!m_modelPart) return ModelPart::Unknown;
 
 	return m_modelPart->itemType();
 }
@@ -1156,13 +1156,13 @@ void ItemBase::partLabelChanged(const QString & newText) {
 	InfoGraphicsView *infographics = InfoGraphicsView::getInfoGraphicsView(this);
 	QString oldText = modelPart()->instanceTitle();
 	setInstanceTitleAux(newText, false);
-	if (infographics != nullptr) {
+	if (infographics) {
 		infographics->partLabelChanged(this, oldText, newText);
 	}
 }
 
 bool ItemBase::isPartLabelVisible() {
-	if (m_partLabel == nullptr) return false;
+	if (!m_partLabel) return false;
 	if (!hasPartLabel()) return false;
 	if (!m_partLabel->initialized()) return false;
 
@@ -1198,7 +1198,7 @@ void ItemBase::partLabelSetHidden(bool hide) {
 
 void ItemBase::partLabelMoved(QPointF oldPos, QPointF oldOffset, QPointF newPos, QPointF newOffset) {
 	InfoGraphicsView * infoGraphicsView = InfoGraphicsView::getInfoGraphicsView(this);
-	if (infoGraphicsView != nullptr) {
+	if (infoGraphicsView) {
 		infoGraphicsView->partLabelMoved(this, oldPos, oldOffset, newPos, newOffset);
 	}
 }
@@ -1206,7 +1206,7 @@ void ItemBase::partLabelMoved(QPointF oldPos, QPointF oldOffset, QPointF newPos,
 void ItemBase::rotateFlipPartLabel(double degrees, Qt::Orientations orientation)
 {
 	InfoGraphicsView * infoGraphicsView = InfoGraphicsView::getInfoGraphicsView(this);
-	if (infoGraphicsView != nullptr) {
+	if (infoGraphicsView) {
 		infoGraphicsView->rotateFlipPartLabel(this, degrees, orientation);
 	}
 }
@@ -1317,12 +1317,10 @@ void ItemBase::transformItem2(const QMatrix & matrix) {
 	transformItem(transform, false);
 }
 
-void ItemBase::collectWireConnectees(QSet<class Wire *> & wires) {
-	Q_UNUSED(wires);
+void ItemBase::collectWireConnectees(QSet<Wire *> & /* wires */) {
 }
 
-bool ItemBase::collectFemaleConnectees(QSet<ItemBase *> & items) {
-	Q_UNUSED(items);
+bool ItemBase::collectFemaleConnectees(QSet<ItemBase *> & /* items */) {
 	return false;			// means no male connectors
 }
 
@@ -1346,7 +1344,7 @@ FSvgRenderer * ItemBase::setUpImage(ModelPart * modelPart, LayerAttributes & lay
 
 	ModelPartShared * modelPartShared = modelPart->modelPartShared();
 
-	if (modelPartShared == nullptr) {
+	if (!modelPartShared) {
 		layerAttributes.error = tr("model part problem");
 		return nullptr;
 	}
@@ -1497,12 +1495,8 @@ void ItemBase::updateConnectionsAux(bool includeRatsnest, QList<ConnectorItem *>
 void ItemBase::figureHover() {
 }
 
-QString ItemBase::retrieveSvg(ViewLayer::ViewLayerID viewLayerID, QHash<QString, QString> & svgHash, bool blackOnly, double dpi, double & factor)
+QString ItemBase::retrieveSvg(ViewLayer::ViewLayerID /* viewLayerID */, QHash<QString, QString> & /* svgHash */, bool /* blackOnly */, double /* dpi */, double & factor)
 {
-	Q_UNUSED(viewLayerID);
-	Q_UNUSED(svgHash);
-	Q_UNUSED(blackOnly);
-	Q_UNUSED(dpi);
 	factor = 1;
 	return "";
 }
@@ -1560,10 +1554,6 @@ void ItemBase::slamZ(double newZ) {
 	double z = qFloor(m_viewGeometry.z()) + newZ;
 	m_viewGeometry.setZ(z);
 	setZValue(z);
-}
-
-bool ItemBase::isEverVisible() {
-	return m_everVisible;
 }
 
 void ItemBase::setEverVisible(bool v) {

@@ -91,7 +91,7 @@ public:
 	virtual void removeLayerKin();
 	ViewLayer::ViewID viewID();
 	QString & viewIDName();
-	ViewLayer::ViewLayerID viewLayerID() const;
+	constexpr ViewLayer::ViewLayerID viewLayerID() const noexcept { return m_viewLayerID; }
 	void setViewLayerID(ViewLayer::ViewLayerID, const LayerHash & viewLayers);
 	void setViewLayerID(const QString & layerName, const LayerHash & viewLayers);
 	bool topLevel();
@@ -166,7 +166,7 @@ public:
 	virtual void figureHover();
 	virtual QString retrieveSvg(ViewLayer::ViewLayerID, QHash<QString, QString> & svgHash, bool blackOnly, double dpi, double & factor);
 	virtual void slamZ(double newZ);
-	bool isEverVisible();
+	constexpr bool isEverVisible() const noexcept { return m_everVisible; }
 	void setEverVisible(bool);
 	virtual bool connectionIsAllowed(ConnectorItem *);
 	virtual bool collectExtraInfo(QWidget * parent, const QString & family, const QString & prop, const QString & value, bool swappingEnabled, QString & returnProp, QString & returnValue, QWidget * & returnWidget, bool & hide);
@@ -199,7 +199,7 @@ public:
 	virtual bool freeRotationAllowed();
 	void ensureUniqueTitle(const QString &title, bool force);
 	virtual void setDropOffset(QPointF offset);
-	bool hasRubberBandLeg() const;
+	constexpr bool hasRubberBandLeg() const noexcept { return m_hasRubberBandLeg; }
 	void killRubberBandLeg();
 	bool sceneEvent(QEvent *event);
 	void clearConnectorItemCache();
