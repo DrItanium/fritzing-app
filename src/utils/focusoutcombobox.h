@@ -40,7 +40,7 @@ protected:
 	void checkSelectAll();
 
 protected:
-	bool m_wasOut;
+	bool m_wasOut = true;
 
 };
 

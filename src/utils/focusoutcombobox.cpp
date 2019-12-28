@@ -23,7 +23,6 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 
 FocusOutComboBox::FocusOutComboBox(QWidget * parent) : QComboBox(parent) {
 	setEditable(true);
-	m_wasOut = true;
 	lineEdit()->installEventFilter( this );
 }
 

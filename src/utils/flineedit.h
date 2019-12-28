@@ -28,8 +28,8 @@ class FLineEdit : public QLineEdit {
 	Q_OBJECT
 
 public:
-	FLineEdit(QWidget * parent = NULL);
-	~FLineEdit();
+	FLineEdit(QWidget * parent = nullptr);
+	~FLineEdit() = default;
 
 protected:
 	void mousePressEvent( QMouseEvent * event );
@@ -45,7 +45,7 @@ protected slots:
 	void editingFinishedSlot();
 
 protected:
-	bool m_readOnly;						// was using readOnly() but mac didn't like it
+	bool m_readOnly = false;						// was using readOnly() but mac didn't like it
 
 };
 

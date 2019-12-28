@@ -30,25 +30,22 @@ class FamilyPropertyComboBox : public FocusOutComboBox
 	Q_OBJECT
 
 public:
-	FamilyPropertyComboBox(const QString & family, const QString & prop, QWidget * parent = 0) : FocusOutComboBox(parent) {
-		m_family = family;
-		m_prop = prop;
+	FamilyPropertyComboBox(const QString & family, const QString & prop, QWidget * parent = nullptr) 
+		: FocusOutComboBox(parent),
+		m_family(family),
+		m_prop(prop)
+	{
 		setEditable(false);
 	}
-	~FamilyPropertyComboBox() {
-	}
+	~FamilyPropertyComboBox() = default;
 
 	void hidePopup() {
 		//DebugDialog::debug(QString("hide popup %1").arg((long) this, 0, 16));
 		QComboBox::hidePopup();
 	}
 
-	const QString & prop() {
-		return m_prop;
-	}
-	const QString & family() {
-		return m_family;
-	}
+	const QString & prop() const noexcept { return m_prop; }
+	const QString & family() const noexcept { return m_family; }
 
 protected:
 	QString m_family;

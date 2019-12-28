@@ -49,7 +49,7 @@ FileProgressDialog::FileProgressDialog(const QString & title, int initialMaximum
 	}
 
 	init(title, initialMaximum);
-	setModal(splash == nullptr);			// OS X Lion doesn't seem to like modal dialogs during splash time
+	setModal(!splash);			// OS X Lion doesn't seem to like modal dialogs during splash time
 
 	show();
 	if (splash) {

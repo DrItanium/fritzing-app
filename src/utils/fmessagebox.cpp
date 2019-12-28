@@ -23,8 +23,7 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 
 bool FMessageBox::BlockMessages = false;
 
-FMessageBox::FMessageBox(QWidget * parent) : QMessageBox(parent) {
-}
+FMessageBox::FMessageBox(QWidget * parent) : QMessageBox(parent) { }
 
 int FMessageBox::exec() {
 	if (BlockMessages) return QMessageBox::Cancel;

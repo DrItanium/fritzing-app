@@ -28,7 +28,7 @@ class FMessageBox : public QMessageBox {
 	Q_OBJECT
 
 public:
-	FMessageBox ( QWidget * parent = 0 );
+	FMessageBox ( QWidget * parent = nullptr);
 
 	int	exec ();
 
