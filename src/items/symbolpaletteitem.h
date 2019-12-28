@@ -110,9 +110,9 @@ public:
 	void addedToScene(bool temporary) override;
 	QString retrieveSvg(ViewLayer::ViewLayerID, QHash<QString, QString> & svgHash, bool blackOnly, double dpi, double & factor) override;
 	PluralType isPlural() override { return Plural; }
-	constexpr bool isOnlyNetLabel() const noexcept { return true; }
+	bool isOnlyNetLabel() override { return true; }
 	QString getInspectorTitle() override;
-	void setInspectorTitle(const QString & oldText, const QString & newText);
+	void setInspectorTitle(const QString & oldText, const QString & newText) override;
 
 protected:
 	QString makeSvg(ViewLayer::ViewLayerID);
