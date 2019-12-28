@@ -37,6 +37,7 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include <QPair>
 #include <QList>
 #include <QPointF>
+#include "featurescpp17.h"
 
 #define ALLMOUSEBUTTONS (Qt::LeftButton | Qt::MidButton | Qt::RightButton | Qt::XButton1 | Qt::XButton2)
 
@@ -62,20 +63,16 @@ static const QString FritzingBundledBinExtension(".fzbz");
 static const QString FritzingPartExtension(".fzp");
 static const QString FritzingBundledPartExtension(".fzpz");
 
-inline double qMin(float f, double d) {
-	return qMin((double) f, d);
+template<typename T>
+constexpr auto ConvertibleToDouble = std::is_convertible_v<std::decay_t<T>, double>;
+template<typename T0, typename T1, ValidWhen<ConvertibleToDouble<T0> && ConvertibleToDouble<T1>> = 0>
+inline double qMin(T0 a, T1 b) noexcept {
+    return qMin(static_cast<double>(a), static_cast<double>(b));
 }
 
-inline double qMin(double d, float f) {
-	return qMin((double) f, d);
-}
-
-inline double qMax(float f, double d) {
-	return qMax((double) f, d);
-}
-
-inline double qMax(double d, float f) {
-	return qMax((double) f, d);
+template<typename T0, typename T1, ValidWhen<ConvertibleToDouble<T0> && ConvertibleToDouble<T1>> = 0>
+inline double qMax(T0 a, T1 b) noexcept {
+    return qMax(static_cast<double>(a), static_cast<double>(b));
 }
 
 const QStringList & fritzingExtensions();

@@ -32,19 +32,11 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include "partfactory.h"
 #include "layerkinpaletteitem.h"
 #include "../svg/svgfilesplitter.h"
+#include "../utils/featurescpp17.h"
 
 #include <QLineEdit>
 #include <QMultiHash>
 #include <QMessageBox>
-
-#if __cplusplus < 201703L
-// std::is_convertible_v is very useful but is found in C++17 and later by
-// default
-namespace std {
-template<typename From, typename To>
-constexpr auto is_convertible_v = is_convertible<From, To>::value;
-} // end namespace std
-#endif
 
 constexpr auto VOLTAGE_HASH_CONVERSION = 1000000;
 

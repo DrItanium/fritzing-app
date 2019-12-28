@@ -38,18 +38,8 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include "../viewgeometry.h"
 #include "../viewlayer.h"
 #include "../utils/misc.h"
+#include "../utils/featurescpp17.h"
 
-#if __cplusplus < 201703L
-namespace std 
-{
-template<typename Base, typename Derived>
-constexpr bool is_base_of_v = is_base_of<Base, Derived>::value;
-
-} // end namespace std
-#endif
-
-template<bool condition>
-using ValidWhen = std::enable_if_t<condition, int>;
 
 class ConnectorItem;
 
