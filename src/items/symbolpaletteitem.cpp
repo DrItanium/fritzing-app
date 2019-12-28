@@ -48,7 +48,7 @@ constexpr auto is_convertible_v = is_convertible<From, To>::value;
 
 constexpr auto VOLTAGE_HASH_CONVERSION = 1000000;
 
-template<typename T, std::enable_if<std::is_convertible_v<T, long>, int> = 0>
+template<typename T, std::enable_if_t<std::is_convertible_v<std::decay_t<T>, long>, int> = 0>
 constexpr long fromVoltage(T v) noexcept 
 {
     return static_cast<long>(v * VOLTAGE_HASH_CONVERSION);
@@ -515,6 +515,14 @@ void SymbolPaletteItem::resetLayerKin() {
 			break;
 		}
 	}
+}
+
+ConnectorItem * SymbolPaletteItem::connector0() noexcept { 
+	return m_connector0;
+}
+
+ConnectorItem * SymbolPaletteItem::connector1() noexcept { 
+	return m_connector1; 
 }
 
 ///////////////////////////////////////////////////////////////

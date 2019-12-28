@@ -62,8 +62,8 @@ public:
 	QString retrieveSvg(ViewLayer::ViewLayerID, QHash<QString, QString> & svgHash, bool blackOnly, double dpi, double & factor);
 	bool collectExtraInfo(QWidget * parent, const QString & family, const QString & prop, const QString & value, bool swappingEnabled, QString & returnProp, QString & returnValue, QWidget * & returnWidget, bool & hide);
 	QString getProperty(const QString & key);
-	ConnectorItem * connector0() noexcept { return m_connector0; }
-	ConnectorItem * connector1() noexcept { return m_connector1; }
+	ConnectorItem * connector0() noexcept;
+	ConnectorItem * connector1() noexcept;
 	PluralType isPlural();
 	void addedToScene(bool temporary);
 	bool hasPartNumberProperty();
