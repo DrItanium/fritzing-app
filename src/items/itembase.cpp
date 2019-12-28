@@ -551,11 +551,11 @@ void ItemBase::updateHidden() {
 void ItemBase::collectConnectors(ConnectorPairHash & connectorHash, SkipCheckFunction skipCheckFunction) {
 	// Is this modelpart check obsolete?
 	ModelPart * modelPart = this->modelPart();
-	if (modelPart == nullptr) return;
+	if (!modelPart) return;
 
 	// collect all the connectorItem pairs
 
-	foreach (ConnectorItem * fromConnectorItem, cachedConnectorItems()) {
+	cachedConnectorItemsAccept([this, &connectorHash, skipCheckFunction](ConnectorItem* fromConnectorItem) {
 		foreach (ConnectorItem * toConnectorItem, fromConnectorItem->connectedToItems()) {
 			if (skipCheckFunction && skipCheckFunction(toConnectorItem)) continue;
 
@@ -563,14 +563,15 @@ void ItemBase::collectConnectors(ConnectorPairHash & connectorHash, SkipCheckFun
 		}
 
 		ConnectorItem * crossConnectorItem = fromConnectorItem->getCrossLayerConnectorItem();
-		if (crossConnectorItem == nullptr) continue;
+		if (!crossConnectorItem) return false;
 
 		foreach (ConnectorItem * toConnectorItem, crossConnectorItem->connectedToItems()) {
 			if (skipCheckFunction && skipCheckFunction(toConnectorItem)) continue;
 
 			connectorHash.insert(crossConnectorItem, toConnectorItem);
 		}
-	}
+		return false;
+	});
 }
 
 ConnectorItem * ItemBase::findConnectorItemWithSharedID(const QString & connectorID)  {
