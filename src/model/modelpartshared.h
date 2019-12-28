@@ -33,21 +33,21 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 
 struct ViewImage {
 	ViewLayer::ViewID viewID;
-	qulonglong layers;
-	qulonglong sticky;
-	qulonglong flipped;
+	qulonglong layers = 0;
+	qulonglong sticky = 0;
+	qulonglong flipped = 0;
 	QString image;
-	bool canFlipHorizontal;
-	bool canFlipVertical;
+	bool canFlipHorizontal = false;
+	bool canFlipVertical = false;
 
-	ViewImage(ViewLayer::ViewID);
+	ViewImage(ViewLayer::ViewID) noexcept;
 };
 
 class ModelPartShared : public QObject
 {
 	Q_OBJECT
 public:
-	ModelPartShared();
+	ModelPartShared() = default;
 	ModelPartShared(QDomDocument &, const QString & path);
 	~ModelPartShared();
 
@@ -155,7 +155,6 @@ protected:
 	// used to populate de StringList that contains both the <tags> and the <properties> values
 	void populateTags(QDomElement parent, QStringList &list);
 	void populateProperties(QDomElement parent, QHash<QString,QString> &hash, QStringList & displayKeys);
-	void commonInit();
 	void ensurePartNumberProperty();
 	void copyPins(ViewLayer::ViewLayerID from, ViewLayer::ViewLayerID to);
 	LayerList viewLayersAux(ViewLayer::ViewID viewID, qulonglong (*accessor)(ViewImage *));
@@ -197,14 +196,14 @@ protected:
 	QHash<QString, class BusShared *> m_buses;
 	QHash<ViewLayer::ViewID, ViewImage *> m_viewImages;
 
-	bool m_connectorsInitialized;
-	bool m_ignoreTerminalPoints;
+	bool m_connectorsInitialized = false;
+	bool m_ignoreTerminalPoints = false;
 
-	bool m_flippedSMD;
-	bool m_needsCopper1;				// for converting pre-two-layer parts
-	qulonglong m_dbid;
-	bool m_hasZeroConnector;
-	int m_ownerCount;
+	bool m_flippedSMD = false;
+	bool m_needsCopper1 = false;				// for converting pre-two-layer parts
+	qulonglong m_dbid = 0;
+	bool m_hasZeroConnector = false;
+	int m_ownerCount = 0;
 	QList< QPointer<ModelPartShared> > m_subparts;
 	QPointer<ModelPartShared> m_superpart;
 	QString m_subpartID;

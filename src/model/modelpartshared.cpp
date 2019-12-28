@@ -47,11 +47,7 @@ void copyPinAttributes(QDomElement & from, QDomElement & to)
 
 ///////////////////////////////////////////////
 
-ViewImage::ViewImage(ViewLayer::ViewID vi) {
-	flipped = sticky = layers = 0;
-	canFlipVertical = canFlipHorizontal = false;
-	viewID = vi;
-}
+ViewImage::ViewImage(ViewLayer::ViewID vi) noexcept : viewID(vi) { }
 
 ///////////////////////////////////////////////
 
@@ -75,28 +71,10 @@ void ModelPartSharedRoot::setSearchTerm(const QString & searchTerm) {
 
 const QString ModelPartShared::PartNumberPropertyName = "part number";
 
-ModelPartShared::ModelPartShared() {
-
-	commonInit();
-
-	m_path = "";
-}
-
-ModelPartShared::ModelPartShared(QDomDocument & domDocument, const QString & path) {
-	commonInit();
-
-	m_path = path;
-
+ModelPartShared::ModelPartShared(QDomDocument & domDocument, const QString & path) : m_path(path) {
 	setDomDocument(domDocument);
 }
 
-void ModelPartShared::commonInit() {
-	m_moduleID = "";
-	m_dbid = 0;
-	m_ownerCount = 0;
-	m_hasZeroConnector = m_flippedSMD = m_connectorsInitialized = m_ignoreTerminalPoints = m_needsCopper1 = false;
-	m_superpart = NULL;
-}
 
 ModelPartShared::~ModelPartShared() {
 	foreach (ConnectorShared * connectorShared, m_connectorSharedHash.values()) {
