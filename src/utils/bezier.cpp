@@ -38,16 +38,16 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 
 // utilities from http://www.flong.com/texts/code/shapers_bez/
 
-double B0 (double t) {
+constexpr double B0 (double t) noexcept {
 	return (1-t)*(1-t)*(1-t);
 }
-double B1 (double t) {
+constexpr double B1 (double t) noexcept {
 	return  3*t* (1-t)*(1-t);
 }
-double B2 (double t) {
+constexpr double B2 (double t) noexcept {
 	return 3*t*t* (1-t);
 }
-double B3 (double t) {
+constexpr double B3 (double t) noexcept {
 	return t*t*t;
 }
 
@@ -55,7 +55,7 @@ double B3 (double t) {
 
 // utilities from http://processingjs.nihongoresources.com/bezierinfo/sketchsource.php?sketch=cubicGaussQuadrature
 
-double base3(double t, double p1, double p2, double p3, double p4)
+constexpr double base3(double t, double p1, double p2, double p3, double p4) noexcept
 {
 	double t1 = -3*p1 + 9*p2 - 9*p3 + 3*p4;
 	double t2 = t*t1 + 6*p1 - 12*p2 + 6*p3;
@@ -131,26 +131,6 @@ Bezier::Bezier() : m_isEmpty(true) { }
 void Bezier::clear()
 {
 	m_isEmpty = true;
-}
-
-QPointF Bezier::cp0() const
-{
-	return m_cp0;
-}
-
-QPointF Bezier::cp1() const
-{
-	return m_cp1;
-}
-
-QPointF Bezier::endpoint0() const
-{
-	return m_endpoint0;
-}
-
-QPointF Bezier::endpoint1() const
-{
-	return m_endpoint1;
 }
 
 void Bezier::set_cp0(QPointF cp0)
@@ -329,7 +309,7 @@ void Bezier::initControlIndex(QPointF p, double width)
 /**
  * Gauss quadrature for cubic Bezier curves
  */
-double Bezier::computeCubicCurveLength(double z, int n) const
+double Bezier::computeCubicCurveLength(double z, int n) const noexcept
 {
 	// http://processingjs.nihongoresources.com/bezierinfo/sketchsource.php?sketch=cubicGaussQuadrature
 
@@ -352,7 +332,7 @@ double Bezier::cubicF(double t) const
 
 void Bezier::copy(const Bezier * other)
 {
-	if (other == NULL) {
+	if (!other) {
 		m_isEmpty = true;
 		return;
 	}

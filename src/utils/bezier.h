@@ -33,10 +33,10 @@ public:
 	Bezier(QPointF cp1, QPointF cp2);
 	Bezier();
 
-	QPointF cp0() const;
-	QPointF cp1() const;
-	QPointF endpoint0() const;
-	QPointF endpoint1() const;
+	constexpr QPointF cp0() const noexcept { return m_cp0; }
+	constexpr QPointF cp1() const noexcept { return m_cp1; }
+	constexpr QPointF endpoint0() const noexcept { return m_endpoint0; }
+	constexpr QPointF endpoint1() const noexcept { return m_endpoint1; }
 	void set_cp0(QPointF);
 	void set_cp1(QPointF);
 	void set_endpoints(QPointF, QPointF);
@@ -52,7 +52,7 @@ public:
 	double yFromT(double t) const;
 	void split(double t, Bezier & left, Bezier & right) const;
 	void initControlIndex(QPointF fromPoint, double width);
-	double computeCubicCurveLength(double z, int n) const;
+	double computeCubicCurveLength(double z, int n) const noexcept;
 	void copy(const Bezier *);
 	double findSplit(QPointF p, double minDistance) const;
 	void translateToZero();
