@@ -137,40 +137,20 @@ static QHash<QString, QStringList> CachedValues;
 ///////////////////////////////////////////////////
 
 ItemBase::ItemBase( ModelPart* modelPart, ViewLayer::ViewID viewID, const ViewGeometry & viewGeometry, long id, QMenu * itemMenu )
-	: QGraphicsSvgItem()
+	: QGraphicsSvgItem(), 
+	m_id(id), 
+	m_itemMenu(itemMenu),
+	m_viewID(viewID),
+	m_modelPart(modelPart)
 {
-	m_fsvgRenderer = nullptr;
-	m_superpart = nullptr;
-	m_acceptsMousePressLegEvent = true;
-
-	m_squashShape = false;
-
 	//DebugDialog::debug(QString("itembase %1 %2").arg(id).arg((long) static_cast<QGraphicsItem *>(this), 0, 16));
-	m_hasRubberBandLeg = m_moveLock = m_hoverEnterSpaceBarWasPressed = m_spaceBarWasPressed = false;
-
-	m_moveLockItem = nullptr;
-	m_stickyItem = nullptr;
-
-	m_swappable = m_everVisible = true;
-
-	m_rightClickedConnector = nullptr;
-
-	m_partLabel = nullptr;
-	m_itemMenu = itemMenu;
-	m_hoverCount = m_connectorHoverCount = m_connectorHoverCount2 = 0;
-	m_viewID = viewID;
-	m_modelPart = modelPart;
 	if (m_modelPart) {
 		m_modelPart->addViewItem(this);
 	}
-	m_id = id;
-	m_canFlipHorizontal = m_canFlipVertical = m_sticky = m_inRotation = m_inactive = m_layerHidden = m_hidden = false;
-
 	setCursor(*CursorMaster::MoveCursor);
 
 	m_viewGeometry.set(viewGeometry);
 	setAcceptHoverEvents ( true );
-	m_zUninitialized = true;
 }
 
 ItemBase::~ItemBase() {
@@ -190,12 +170,13 @@ ItemBase::~ItemBase() {
 		itemBase->addSticky(this, false);
 	}
 
-	if (m_modelPart != nullptr) {
+	if (m_modelPart) {
 		m_modelPart->removeViewItem(this);
 	}
 
 	if (m_fsvgRenderer) {
 		delete m_fsvgRenderer;
+		m_fsvgRenderer = nullptr;
 	}
 
 }
@@ -237,10 +218,6 @@ QSizeF ItemBase::size() {
 	return m_size;
 }
 
-qint64 ItemBase::id() const {
-	return m_id;
-}
-
 void ItemBase::resetID() {
 	m_id = m_modelPart->modelIndex() * ModelPart::indexMultiplier;
 }
@@ -258,7 +235,7 @@ void ItemBase::setModelPart(ModelPart * modelPart) {
 }
 
 ModelPartShared * ItemBase::modelPartShared() {
-	if (m_modelPart == nullptr) return nullptr;
+	if (!m_modelPart) return nullptr;
 
 	return m_modelPart->modelPartShared();
 }
@@ -405,10 +382,6 @@ ViewLayer::ViewID ItemBase::viewID() {
 
 QString & ItemBase::viewIDName() {
 	return ViewLayer::viewIDName(m_viewID);
-}
-
-ViewLayer::ViewLayerID ItemBase::viewLayerID() const {
-	return m_viewLayerID;
 }
 
 void ItemBase::setViewLayerID(const QString & layerName, const LayerHash & viewLayers) {
@@ -2005,11 +1978,6 @@ void ItemBase::collectPropsMap(QString & family, QMap<QString, QString> & propsM
 
 void ItemBase::setDropOffset(QPointF)
 {
-}
-
-bool ItemBase::hasRubberBandLeg() const
-{
-	return m_hasRubberBandLeg;
 }
 
 bool ItemBase::sceneEvent(QEvent *event)
