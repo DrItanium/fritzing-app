@@ -862,6 +862,3 @@ ModelPart * ModelBase::createOldSchematicPartAux(ModelPart * modelPart, const QS
 	return oldModelPart;
 }
 
-bool ModelBase::checkForReversedWires() {
-	return m_checkForReversedWires;
-}

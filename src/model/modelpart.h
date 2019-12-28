@@ -95,8 +95,8 @@ public:
 	class ItemBase * viewItem(ViewLayer::ViewID);
 	bool hasViewItems();
 	void initConnectors(bool force=false);
-	const QHash<QString, QPointer<Connector> > & connectors();
-	long modelIndex();
+	const QHash<QString, QPointer<Connector> > & connectors() const { return m_connectorHash; }
+	constexpr long modelIndex() const noexcept { return m_index; }
 	void setModelIndex(long index);
 	void setModelIndexFromMultiplied(long multipliedIndex);
 	void setInstanceDomElement(const QDomElement &);
@@ -129,16 +129,20 @@ public:
 	Bus * bus(const QString & busID);
 	bool ignoreTerminalPoints();
 
-	bool isCore();
+	template<LocationFlag mask>
+	constexpr bool locationFlagMarkedAs() const noexcept {
+		return (m_locationFlags & mask) != 0;
+	}
+	constexpr bool isCore() const noexcept { return locationFlagMarkedAs<CoreFlag>(); }
 	void setCore(bool core);
-	bool isContrib();
+	constexpr bool isContrib() const noexcept { return locationFlagMarkedAs<ContribFlag>(); }
 	void setContrib(bool contrib);
-	bool isAlien(); // from "outside"
+	constexpr bool isAlien() const noexcept { return locationFlagMarkedAs<AlienFlag>(); } // from outside
 	void setAlien(bool alien);
-	bool isFzz(); // from "outside"
+	constexpr bool isFzz() const noexcept { return locationFlagMarkedAs<FzzFlag>(); } // from outside
 	void setFzz(bool alien);
 	void setLocationFlag(bool setting, LocationFlag flag);
-	bool isInBin();
+	constexpr bool isInBin() const noexcept { return locationFlagMarkedAs<InBinFlag>(); }
 	void setInBin(bool);
 
 	bool hasViewID(ViewLayer::ViewID);
@@ -155,8 +159,8 @@ public:
 	QList<ModelPart*> getAllNonCoreParts();
 	bool hasViewID(long id);
 
-	const QString & instanceTitle() const;
-	const QString & instanceText();
+	const QString & instanceTitle() const noexcept { return m_instanceTitle; }
+	const QString & instanceText() const noexcept { return m_instanceText; }
 	void setInstanceTitle(QString, bool initial);
 	void setInstanceText(QString);
 	QString getNextTitle(const QString & candidate);
@@ -205,7 +209,6 @@ protected:
 	void writeNestedTag(QXmlStreamWriter & streamWriter, QString tagName, const QStringList &values, QString childTag);
 	void writeNestedTag(QXmlStreamWriter & streamWriter, QString tagName, const QHash<QString,QString> &values, QString childTag, QString attrName);
 
-	void commonInit(ItemType type);
 	void saveInstance(QXmlStreamWriter & streamWriter);
 	QList< QPointer<ModelPart> > * ensureInstanceTitleIncrements(const QString & prefix);
 	void clearOldInstanceTitle(const QString & title);
@@ -221,8 +224,8 @@ protected:
 	long m_index;						// only used at save time to identify model parts in the xml
 	QDomElement m_instanceDomElement;	// only used at load time (so far)
 
-	LocationFlags m_locationFlags;
-	bool m_indexSynched;
+	LocationFlags m_locationFlags = 0;
+	bool m_indexSynched = false;
 
 	QString m_instanceTitle;
 	QString m_instanceText;

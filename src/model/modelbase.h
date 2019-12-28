@@ -47,7 +47,7 @@ public:
 	ModelPart * genFZP(const QString & moduleID, ModelBase * referenceModel);
 	const QString & fritzingVersion();
 	void setReferenceModel(ModelBase *);
-	bool checkForReversedWires();
+	constexpr bool checkForReversedWires() const noexcept { return m_checkForReversedWires; }
 
 public:
 	static bool onCoreList(const QString & moduleID);
