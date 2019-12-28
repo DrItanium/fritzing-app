@@ -26,14 +26,6 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include <qmath.h>
 #include <QtDebug>
 
-const double GraphicsUtils::IllustratorDPI = 72;
-const double GraphicsUtils::StandardFritzingDPI = 1000;
-const double GraphicsUtils::SVGDPI = 90;
-const double GraphicsUtils::InchesPerMeter = 39.370078;
-const double GraphicsUtils::StandardSchematicSeparationMils = 295.275591;   // 7.5mm
-const double GraphicsUtils::StandardSchematicSeparation10thinMils = 100;   // 0.1 inches
-
-
 void GraphicsUtils::distanceFromLine(double cx, double cy, double ax, double ay, double bx, double by,
                                      double & dx, double & dy, double &distanceSegment, bool & atEndpoint)
 {
@@ -129,39 +121,6 @@ QPointF GraphicsUtils::calcConstraint(QPointF initial, QPointF current) {
 	return result;
 }
 
-double GraphicsUtils::pixels2mils(double p, double dpi) {
-	return p * 1000.0 / dpi;
-}
-
-double GraphicsUtils::pixels2ins(double p, double dpi) {
-	return p / dpi;
-}
-
-double GraphicsUtils::distanceSqd(QPointF p1, QPointF p2) {
-	return ((p1.x() - p2.x()) * (p1.x() - p2.x())) + ((p1.y() - p2.y()) * (p1.y() - p2.y()));
-}
-
-double GraphicsUtils::distanceSqd(QPoint p1, QPoint p2) {
-	double dpx = p1.x() - p2.x();
-	double dpy = p1.y() - p2.y();
-	return (dpx * dpx) + (dpy * dpy);
-}
-
-double GraphicsUtils::mm2mils(double mm) {
-	return (mm / 25.4 * 1000);
-}
-
-double GraphicsUtils::mm2pixels(double mm) {
-	return (90 * mm / 25.4);
-}
-
-double GraphicsUtils::pixels2mm(double p, double dpi) {
-	return (p / dpi * 25.4);
-}
-
-double GraphicsUtils::mils2pixels(double m, double dpi) {
-	return (dpi * m / 1000);
-}
 
 void GraphicsUtils::saveTransform(QXmlStreamWriter & streamWriter, const QTransform & transform) {
 	if (transform.isIdentity()) return;
@@ -366,7 +325,7 @@ QPainterPath GraphicsUtils::shapeFromPath(const QPainterPath &path, const QPen &
 
 	// We unfortunately need this hack as QPainterPathStroker will set a width of 1.0
 	// if we pass a value of 0.0 to QPainterPathStroker::setWidth()
-	static const double penWidthZero = double(0.00000001);
+	static constexpr double penWidthZero = double(0.00000001);
 
 	if (path == QPainterPath())
 		return path;
@@ -397,9 +356,9 @@ void GraphicsUtils::qt_graphicsItem_highlightSelected(QPainter *painter, const Q
 	if (qMin(mbrect.width(), mbrect.height()) < double(1.0))
 		return;
 
-	double itemPenWidth = 1.0;
-	const double pad = itemPenWidth / 2;
-	const double penWidth = 0; // cosmetic pen
+	constexpr double itemPenWidth = 1.0;
+	constexpr double pad = itemPenWidth / 2;
+	constexpr double penWidth = 0; // cosmetic pen
 
 	const QColor fgcolor = option->palette.windowText().color();
 	const QColor bgcolor( // ensure good contrast against fgcolor
@@ -452,8 +411,8 @@ void GraphicsUtils::drawBorder(QImage * image, int border) {
 	painter.end();
 }
 
-bool almostEqual(qreal a, qreal b) {
-	static qreal nearly = 0.001;
+constexpr bool almostEqual(qreal a, qreal b) noexcept {
+	constexpr qreal nearly = 0.001;
 	return (qAbs(a - b) < nearly);
 }
 

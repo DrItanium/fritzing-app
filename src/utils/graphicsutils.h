@@ -41,16 +41,34 @@ public:
 	                             double & dx, double & dy, double &distanceSegment, bool & atEndpoint);
 	static QPointF calcConstraint(QPointF initial, QPointF current);
 
-	static double pixels2mils(double p, double dpi);
-	static double pixels2ins(double p, double dpi);
-	static double distanceSqd(QPointF p1, QPointF p2);
-	static double distanceSqd(QPoint p1, QPoint p2);
+	static constexpr double pixels2mils(double p, double dpi) noexcept {
+        return p * 1000.0 / dpi;
+    }
+	static constexpr double pixels2ins(double p, double dpi) noexcept {
+        return p / dpi;
+    }
+	static constexpr double distanceSqd(QPointF p1, QPointF p2) noexcept {
+        return ((p1.x() - p2.x()) * (p1.x() - p2.x())) + ((p1.y() - p2.y()) * (p1.y() - p2.y()));
+    }
+	static constexpr double distanceSqd(QPoint p1, QPoint p2) noexcept {
+        double dpx = p1.x() - p2.x();
+        double dpy = p1.y() - p2.y();
+        return (dpx * dpx) + (dpy * dpy);
+    }
 	static double getNearestOrdinate(double ordinate, double units);
 
-	static double mm2mils(double mm);
-	static double pixels2mm(double p, double dpi);
-	static double mm2pixels(double mm);
-	static double mils2pixels(double m, double dpi);
+	static constexpr double mm2mils(double mm) noexcept {
+        return (mm / 25.4 * 1000);
+    }
+	static constexpr double pixels2mm(double p, double dpi) noexcept {
+	    return (p / dpi * 25.4);
+    }
+	static constexpr double mm2pixels(double mm) noexcept {
+        return (90 * mm / 25.4);
+    }
+	static constexpr double mils2pixels(double m, double dpi) noexcept {
+        return (dpi * m / 1000);
+    }
 	static void saveTransform(QXmlStreamWriter & streamWriter, const QTransform & transform);
 	static bool loadTransform(const QDomElement & transformElement, QTransform & transform);
 	static bool isRect(const QPolygonF & poly);
@@ -67,13 +85,20 @@ public:
 	static bool isFlipped(const QMatrix & matrix, double & rotation);
 
 public:
-	static const double IllustratorDPI;
-	static const double StandardFritzingDPI;
-	static const double SVGDPI;
-	static const double InchesPerMeter;
-	static const double StandardSchematicSeparationMils;
-	static const double StandardSchematicSeparation10thinMils;
-
+	static constexpr double IllustratorDPI = 72;
+	static constexpr double StandardFritzingDPI = 1000;
+	static constexpr double SVGDPI = 90;
+	static constexpr double InchesPerMeter = 39.370078;
+	static constexpr double StandardSchematicSeparationMils = 295.275591; // 7.5mm
+	static constexpr double StandardSchematicSeparation10thinMils = 100;  // 0.1 inches
+public:
+    // make sure that instances of this class cannot be constructed
+    GraphicsUtils() = delete;
+    ~GraphicsUtils() = delete;
+    GraphicsUtils(const GraphicsUtils&) = delete;
+    GraphicsUtils(GraphicsUtils&&) = delete;
+    GraphicsUtils& operator=(GraphicsUtils&&) = delete;
+    GraphicsUtils& operator=(const GraphicsUtils&) = delete;
 
 };
 
