@@ -63,7 +63,7 @@ constexpr double base3(double t, double p1, double p2, double p3, double p4) noe
 }
 
 // Legendre-Gauss abscissae (xi values, defined at i=n as the roots of the nth order Legendre polynomial Pn(x))
-double Tvalues[25][24] = {
+constexpr double Tvalues[25][24] = {
 	{},
 	{},
 	{-0.5773502691896257310588680411456152796745,0.5773502691896257310588680411456152796745},
@@ -92,7 +92,7 @@ double Tvalues[25][24] = {
 };
 
 // Legendre-Gauss weights (wi values, defined by a function linked to in the Bezier primer article)
-double Cvalues[25][24] = {
+constexpr double Cvalues[25][24] = {
 	{},
 	{},
 	{1.0000000000000000000000000000000000000000,1.0000000000000000000000000000000000000000},
