@@ -33,6 +33,7 @@ class SketchModel : public ModelBase
 public:
 	SketchModel(bool makeRoot);
 	SketchModel(ModelPart * root);
+    ~SketchModel() override = default;
 
 	void removeModelPart(ModelPart *);
 	ModelPart * findModelPart(const QString & moduleID, long id);

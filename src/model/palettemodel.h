@@ -36,7 +36,7 @@ class PaletteModel : public ModelBase
 public:
 	PaletteModel();
 	PaletteModel(bool makeRoot, bool doInit);
-	~PaletteModel();
+	~PaletteModel() override;
 	ModelPart * retrieveModelPart(const QString & moduleID);
 	virtual bool containsModelPart(const QString & moduleID);
 	virtual ModelPart * loadPart(const QString & path, bool update);
@@ -57,11 +57,11 @@ public:
 
 protected:
 	QHash<QString, ModelPart *> m_partHash;
-	bool m_loadedFromFile;
+	bool m_loadedFromFile = false;
 	QString m_loadedFrom; // The file this was loaded from, only if m_loadedFromFile == true
 
-	bool m_loadingContrib;
-	bool m_fullLoad;
+	bool m_loadingContrib = false;
+	bool m_fullLoad = false;
 
 signals:
 	void loadedPart(int i, int total);
