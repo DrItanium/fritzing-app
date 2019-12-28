@@ -36,10 +36,6 @@ QList<QString> ModelBase::CoreList;
 
 ModelBase::ModelBase( bool makeRoot )
 {
-	m_checkForReversedWires = m_useOldSchematics = false;
-	m_reportMissingModules = true;
-	m_referenceModel = NULL;
-	m_root = NULL;
 	if (makeRoot) {
 		m_root = new ModelPart();
 		m_root->setModelPartShared(new ModelPartSharedRoot());
@@ -50,7 +46,7 @@ ModelBase::~ModelBase() {
 	if (m_root) {
 		ModelPartShared * modelPartShared = m_root->modelPartShared();
 		if (modelPartShared) {
-			m_root->setModelPartShared(NULL);
+			m_root->setModelPartShared(nullptr);
 			delete modelPartShared;
 		}
 		delete m_root;
@@ -62,7 +58,7 @@ ModelPart * ModelBase::root() {
 }
 
 ModelPart * ModelBase::retrieveModelPart(const QString & /* moduleID */)  {
-	return NULL;
+	return nullptr;
 }
 
 // loads a model from an fz file--assumes a reference model exists with all parts
@@ -71,7 +67,7 @@ bool ModelBase::loadFromFile(const QString & fileName, ModelBase * referenceMode
 
 	QFile file(fileName);
 	if (!file.open(QFile::ReadOnly | QFile::Text)) {
-		FMessageBox::warning(NULL, QObject::tr("Fritzing"),
+		FMessageBox::warning(nullptr, QObject::tr("Fritzing"),
 		                     QObject::tr("Cannot read file %1:\n%2.")
 		                     .arg(fileName)
 		                     .arg(file.errorString()));
@@ -84,7 +80,7 @@ bool ModelBase::loadFromFile(const QString & fileName, ModelBase * referenceMode
 	QDomDocument domDocument;
 
 	if (!domDocument.setContent(&file, true, &errorStr, &errorLine, &errorColumn)) {
-		FMessageBox::information(NULL, QObject::tr("Fritzing"),
+		FMessageBox::information(nullptr, QObject::tr("Fritzing"),
 		                         QObject::tr("Parse error (1) at line %1, column %2:\n%3\n%4")
 		                         .arg(errorLine)
 		                         .arg(errorColumn)
@@ -95,14 +91,14 @@ bool ModelBase::loadFromFile(const QString & fileName, ModelBase * referenceMode
 
 	QDomElement root = domDocument.documentElement();
 	if (root.isNull()) {
-		FMessageBox::information(NULL, QObject::tr("Fritzing"), QObject::tr("The file %1 is not a Fritzing file (2).").arg(fileName));
+		FMessageBox::information(nullptr, QObject::tr("Fritzing"), QObject::tr("The file %1 is not a Fritzing file (2).").arg(fileName));
 		return false;
 	}
 
 	emit loadedRoot(fileName, this, root);
 
 	if (root.tagName() != "module") {
-		FMessageBox::information(NULL, QObject::tr("Fritzing"), QObject::tr("The file %1 is not a Fritzing file (4).").arg(fileName));
+		FMessageBox::information(nullptr, QObject::tr("Fritzing"), QObject::tr("The file %1 is not a Fritzing file (4).").arg(fileName));
 		return false;
 	}
 
@@ -177,14 +173,14 @@ bool ModelBase::loadFromFile(const QString & fileName, ModelBase * referenceMode
 
 	QDomElement instances = root.firstChildElement("instances");
 	if (instances.isNull()) {
-		FMessageBox::information(NULL, QObject::tr("Fritzing"), QObject::tr("The file %1 is not a Fritzing file (3).").arg(fileName));
+		FMessageBox::information(nullptr, QObject::tr("Fritzing"), QObject::tr("The file %1 is not a Fritzing file (3).").arg(fileName));
 		return false;
 	}
 
 	// delete any aready-existing model parts
 	for (int i = m_root->children().count() - 1; i >= 0; i--) {
 		QObject* child = m_root->children()[i];
-		child->setParent(NULL);
+		child->setParent(nullptr);
 		delete child;
 	}
 
@@ -254,7 +250,7 @@ bool ModelBase::loadInstances(QDomDocument & domDocument, QDomElement & instance
 {
 	QHash<QString, QString> missingModules;
 	QDomElement instance = instances.firstChildElement("instance");
-	ModelPart* modelPart = NULL;
+	ModelPart* modelPart = nullptr;
 	while (!instance.isNull()) {
 		emit loadingInstance(this, instance);
 
@@ -289,17 +285,17 @@ bool ModelBase::loadInstances(QDomDocument & domDocument, QDomElement & instance
 
 		bool generated = false;
 		modelPart = m_referenceModel->retrieveModelPart(moduleIDRef);
-		if (modelPart == NULL) {
+		if (!modelPart) {
 			DebugDialog::debug(QString("module id %1 not found in database").arg(moduleIDRef));
 			modelPart = fixObsoleteModuleID(domDocument, instance, moduleIDRef);
-			if (modelPart == NULL) {
+			if (!modelPart) {
 				modelPart = genFZP(moduleIDRef, m_referenceModel);
 				if (modelPart) {
 					instance.setAttribute("moduleIdRef", modelPart->moduleID());
 					moduleIDRef = modelPart->moduleID();
 					generated = true;
 				}
-				if (modelPart == NULL) {
+				if (!modelPart) {
 					missingModules.insert(moduleIDRef, instance.attribute("path"));
 					instance = instance.nextSiblingElement("instance");
 					continue;
@@ -381,7 +377,7 @@ bool ModelBase::loadInstances(QDomDocument & domDocument, QDomElement & instance
 			                .arg(key).arg(tr("at")).arg(missingModules.value(key, ""));
 		}
 		unableToFind += "</table></body></html>";
-		FMessageBox::warning(NULL, QObject::tr("Fritzing"), unableToFind);
+		FMessageBox::warning(nullptr, QObject::tr("Fritzing"), unableToFind);
 	}
 
 
@@ -401,31 +397,6 @@ ModelPart * ModelBase::addModelPart(ModelPart * parent, ModelPart * copyChild) {
 	modelPart->flipSMDAnd();
 	return modelPart;
 }
-
-ModelPart * ModelBase::addPart(QString newPartPath, bool addToReference) {
-	Q_UNUSED(newPartPath);
-	Q_UNUSED(addToReference);
-	throw "ModelBase::addPart should not be invoked";
-	return NULL;
-}
-
-ModelPart * ModelBase::addPart(QString newPartPath, bool addToReference, bool updateIdAlreadyExists)
-{
-	Q_UNUSED(updateIdAlreadyExists);
-	Q_UNUSED(newPartPath);
-	Q_UNUSED(addToReference);
-	throw "ModelBase::addPart should not be invoked";
-	return NULL;
-}
-
-// TODO Mariano: this function should never get called. Make pure virtual
-bool ModelBase::addPart(ModelPart * modelPart, bool update) {
-	Q_UNUSED(modelPart);
-	Q_UNUSED(update);
-	throw "ModelBase::addPart should not be invoked";
-	return false;
-}
-
 
 void ModelBase::save(const QString & fileName, bool asPart) {
 	QFileInfo info(fileName);

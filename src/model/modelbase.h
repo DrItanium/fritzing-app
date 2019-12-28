@@ -76,10 +76,10 @@ protected:
 protected:
 	QPointer<ModelPart> m_root;
 	QPointer<ModelBase> m_referenceModel;
-	bool m_reportMissingModules;
+	bool m_reportMissingModules = true;
 	QString m_fritzingVersion;
-	bool m_useOldSchematics;
-	bool m_checkForReversedWires;
+	bool m_useOldSchematics = false;
+	bool m_checkForReversedWires = false;
 
 protected:
 	static QList<QString> CoreList;
