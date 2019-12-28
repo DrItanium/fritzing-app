@@ -213,8 +213,8 @@ void Bezier::recalc(QPointF p)
 	// http://www.lemoda.net/maths/bezier-length/index.html,
 
 	// arbitrary but reasonable t-values for interior control points
-	double t0 = 0.3;
-	double t1 = 0.7;
+	constexpr double t0 = 0.3;
+	constexpr double t1 = 0.7;
 
 	if (m_drag_cp0) {
 		double x = (p.x() - m_endpoint0.x() * B0(t0) - m_cp1.x() * B2(t0) - m_endpoint1.x() * B3(t0)) / B1(t0);
