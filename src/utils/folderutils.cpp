@@ -44,7 +44,6 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include "../lib/qtsysteminfo/QtSystemInfo.h"
 
 
-FolderUtils* FolderUtils::singleton = NULL;
 QString FolderUtils::m_openSaveFolder = "";
 
 FolderUtils::FolderUtils() {
@@ -61,16 +60,18 @@ FolderUtils::FolderUtils() {
 
 }
 
-FolderUtils::~FolderUtils() {
+FolderUtils* singleton() noexcept 
+{
+	static FolderUtils* _singleton = nullptr;
+	if (!_singleton) {
+		_singleton = new FolderUtils();
+	}
+	return _singleton;
 }
 
 // finds a subfolder of the application directory searching backward up the tree
 QDir  FolderUtils::getApplicationSubFolder(QString search) {
-	if (singleton == NULL) {
-		singleton = new FolderUtils();
-	}
-
-	QString path = singleton->applicationDirPath();
+	QString path = singleton()->applicationDirPath();
 	path += "/" + search;
 	//DebugDialog::debug(QString("path %1").arg(path) );
 	QDir dir(path);
@@ -90,29 +91,17 @@ QDir  FolderUtils::getApplicationSubFolder(QString search) {
 }
 
 QString FolderUtils::getApplicationSubFolderPath(QString search) {
-	if (singleton == NULL) {
-		singleton = new FolderUtils();
-	}
-
 	QDir dir = getApplicationSubFolder(search);
 	return dir.path();
 }
 
 QString FolderUtils::getAppPartsSubFolderPath(QString search) {
-	if (singleton == NULL) {
-		singleton = new FolderUtils();
-	}
-
 	QDir dir = getAppPartsSubFolder(search);
 	return dir.path();
 }
 
 QDir FolderUtils::getAppPartsSubFolder(QString search) {
-	if (singleton == NULL) {
-		singleton = new FolderUtils();
-	}
-
-	return singleton->getAppPartsSubFolder2(search);
+	return singleton()->getAppPartsSubFolder2(search);
 }
 
 QDir FolderUtils::getAppPartsSubFolder2(QString search) {
@@ -167,36 +156,17 @@ bool FolderUtils::createFolderAndCdIntoIt(QDir &dir, QString newFolder) {
 
 bool FolderUtils::setApplicationPath(const QString & path)
 {
-	if (singleton == NULL) {
-		singleton = new FolderUtils();
-	}
-
-	return singleton->setApplicationPath2(path);
+	return singleton()->setApplicationPath2(path);
 }
 
 bool FolderUtils::setAppPartsPath(const QString & path)
 {
-	if (singleton == NULL) {
-		singleton = new FolderUtils();
-	}
-
-	return singleton->setPartsPath2(path);
-}
-
-void FolderUtils::cleanup() {
-	if (singleton) {
-		delete singleton;
-		singleton = NULL;
-	}
+	return singleton()->setPartsPath2(path);
 }
 
 const QString FolderUtils::getLibraryPath()
 {
-	if (singleton == NULL) {
-		singleton = new FolderUtils();
-	}
-
-	return singleton->libraryPath();
+	return singleton()->libraryPath();
 }
 
 
@@ -721,12 +691,8 @@ void FolderUtils::showInFolder(const QString & path)
 void FolderUtils::createUserDataStoreFolders() {
 	// make sure that the folder structure for parts and bins, exists
 
-	if (singleton == NULL) {
-		singleton = new FolderUtils();
-	}
-
 	QDir userDataStore(getTopLevelUserDataStorePath());
-	foreach(QString folder, singleton->m_userFolders) {
+	foreach(QString folder, singleton()->m_userFolders) {
 		QString path = userDataStore.absoluteFilePath(folder);
 		if(!QFileInfo(path).exists()) {
 			userDataStore.mkpath(folder);
@@ -734,7 +700,7 @@ void FolderUtils::createUserDataStoreFolders() {
 	}
 
 	QDir documents(getTopLevelDocumentsPath());
-	QStringList documentFolders(singleton->m_documentFolders);
+	QStringList documentFolders(singleton()->m_documentFolders);
 	foreach(QString folder, documentFolders) {
 		QString path = documents.absoluteFilePath(folder);
 		if(!QFileInfo(path).exists()) {

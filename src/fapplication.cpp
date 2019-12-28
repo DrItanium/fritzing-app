@@ -622,7 +622,8 @@ FApplication::~FApplication(void)
 	TipsAndTricks::cleanup();
 	FirstTimeHelpDialog::cleanup();
 	TranslatorListModel::cleanup();
-	FolderUtils::cleanup();
+    // no need to clean up after the singleton
+	//FolderUtils::cleanup();
 	SearchLineEdit::cleanup();
 	RatsnestColors::cleanup();
 	HtmlInfoView::cleanup();

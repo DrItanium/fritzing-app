@@ -25,6 +25,7 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include <QDir>
 #include <QStringList>
 #include <QFileDialog>
+#include <memory>
 
 #include "misc.h"
 
@@ -57,7 +58,6 @@ public:
 	static bool createFZAndSaveTo(const QDir &dirToCompress, const QString &filename, const QStringList & skipSuffixes);
 	static bool unzipTo(const QString &filepath, const QString &dirToDecompress, QString & error);
 	static void replicateDir(QDir srcDir, QDir targDir);
-	static void cleanup();
 	static void collectFiles(const QDir & parent, QStringList & filters, QStringList & files, bool recursive);
 	static void makePartFolderHierarchy(const QString & prefixFolder, const QString & destFolder);
   	static void copyBin(const QString & dest, const QString & source);
@@ -67,7 +67,7 @@ public:
 
 protected:
 	FolderUtils();
-	~FolderUtils();
+	~FolderUtils() = default;
 
 	const QStringList & userDataStoreFolders();
 	bool setApplicationPath2(const QString & path);
@@ -77,7 +77,7 @@ protected:
 	QDir getAppPartsSubFolder2(QString);
 
 protected:
-	static FolderUtils* singleton;
+    static FolderUtils* singleton() noexcept;
 	static QString m_openSaveFolder;
 
 protected:
