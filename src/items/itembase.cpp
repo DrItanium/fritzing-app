@@ -344,19 +344,16 @@ void ItemBase::saveInstance(QXmlStreamWriter & streamWriter) {
 	}
 
 
-	bool saveConnectorItems = false;
-	foreach (ConnectorItem * connectorItem, cachedConnectorItems()) {
-		if (connectorItem->connectionsCount() > 0 || connectorItem->hasRubberBandLeg() || connectorItem->isGroundFillSeed()) {
-			saveConnectorItems = true;
-			break;
-		}
-	}
+	bool saveConnectorItems = cachedConnectorItemsAccept([](ConnectorItem* connectorItem) {
+				return (connectorItem->connectionsCount() > 0 || connectorItem->hasRubberBandLeg() || connectorItem->isGroundFillSeed());
+			});
 
 	if (saveConnectorItems) {
 		streamWriter.writeStartElement("connectors");
-		foreach (ConnectorItem * connectorItem, cachedConnectorItems()) {
-			connectorItem->saveInstance(streamWriter);
-		}
+		cachedConnectorItemsAccept([&streamWriter](ConnectorItem* connectorItem) {
+					connectorItem->saveInstance(streamWriter);
+					return false;
+				});
 		streamWriter.writeEndElement();
 	}
 
@@ -374,10 +371,6 @@ void ItemBase::writeGeometry(QXmlStreamWriter & streamWriter) {
 
 ViewGeometry & ItemBase::getViewGeometry() {
 	return m_viewGeometry;
-}
-
-ViewLayer::ViewID ItemBase::viewID() {
-	return m_viewID;
 }
 
 QString & ItemBase::viewIDName() {
@@ -523,54 +516,36 @@ void ItemBase::setHidden(bool hide) {
 
 	m_hidden = hide;
 	updateHidden();
-	foreach (QGraphicsItem * item, childItems()) {
-		NonConnectorItem * nonconnectorItem = dynamic_cast<NonConnectorItem *>(item);
-		if (nonconnectorItem == nullptr) continue;
-
-		nonconnectorItem->setHidden(hide);
-	}
+	childItemsAccept<NonConnectorItem>([this, hide](NonConnectorItem* item) {
+				item->setHidden(hide);
+				return false;
+			});
 }
 
 void ItemBase::setInactive(bool inactivate) {
 
 	m_inactive = inactivate;
 	updateHidden();
-	foreach (QGraphicsItem * item, childItems()) {
-		NonConnectorItem * nonconnectorItem = dynamic_cast<NonConnectorItem *>(item);
-		if (nonconnectorItem == nullptr) continue;
-
-		nonconnectorItem->setInactive(inactivate);
-	}
+	childItemsAccept<NonConnectorItem>([this, inactivate](NonConnectorItem* item) {
+				item->setInactive(inactivate);
+				return false;
+			});
 }
 
 void ItemBase::setLayerHidden(bool layerHidden) {
 
 	m_layerHidden = layerHidden;
 	updateHidden();
-	foreach (QGraphicsItem * item, childItems()) {
-		NonConnectorItem * nonconnectorItem = dynamic_cast<NonConnectorItem *>(item);
-		if (nonconnectorItem == nullptr) continue;
-
-		nonconnectorItem->setLayerHidden(layerHidden);
-	}
+	childItemsAccept<NonConnectorItem>([layerHidden](NonConnectorItem* item) {
+				item->setLayerHidden(layerHidden);
+				return false;
+			});
 }
 
 void ItemBase::updateHidden() {
 	setAcceptedMouseButtons(m_hidden || m_inactive || m_layerHidden ? Qt::NoButton : ALLMOUSEBUTTONS);
 	setAcceptHoverEvents(!(m_hidden || m_inactive || m_layerHidden));
 	update();
-}
-
-bool ItemBase::hidden() {
-	return m_hidden;
-}
-
-bool ItemBase::layerHidden() {
-	return m_layerHidden;
-}
-
-bool ItemBase::inactive() {
-	return m_inactive;
 }
 
 void ItemBase::collectConnectors(ConnectorPairHash & connectorHash, SkipCheckFunction skipCheckFunction) {
@@ -697,7 +672,7 @@ bool ItemBase::getRatsnest() {
 
 QList<Bus *> ItemBase::buses() {
 	QList<Bus *> busList;
-	if (m_modelPart == nullptr) return busList;
+	if (!m_modelPart) return busList;
 
 	foreach (Bus * bus, m_modelPart->buses().values()) {
 		busList.append(bus);
@@ -706,14 +681,13 @@ QList<Bus *> ItemBase::buses() {
 	return busList;
 }
 
-void ItemBase::busConnectorItems(class Bus * bus, ConnectorItem * fromConnectorItem, QList<class ConnectorItem *> & items) {
-	Q_UNUSED(fromConnectorItem)
+void ItemBase::busConnectorItems(class Bus * bus, ConnectorItem * /* fromConnectorItem */, QList<class ConnectorItem *> & items) {
 
-	if (bus == nullptr) return;
+	if (!bus) return;
 
 	foreach (Connector * connector, bus->connectors()) {
 		foreach (ConnectorItem * connectorItem, connector->viewItems()) {
-			if (connectorItem != nullptr) {
+			if (connectorItem) {
 				//connectorItem->debugInfo(QString("on the bus %1").arg((long) connector, 0, 16));
 				if (connectorItem->attachedTo() == this) {
 					items.append(connectorItem);
@@ -752,10 +726,6 @@ int ItemBase::itemType() const
 	if (!m_modelPart) return ModelPart::Unknown;
 
 	return m_modelPart->itemType();
-}
-
-bool ItemBase::inHover() {
-	return (!m_inactive && (m_connectorHoverCount > 0 || m_hoverCount > 0 || m_connectorHoverCount2 > 0));
 }
 
 void ItemBase::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
@@ -970,11 +940,11 @@ ConnectorItem* ItemBase::newConnectorItem(ItemBase * layerKin, Connector *connec
 }
 
 ConnectorItem * ItemBase::anyConnectorItem() {
-	foreach (ConnectorItem * connectorItem, cachedConnectorItems()) {
-		return connectorItem;
-	}
+	auto connectors = cachedConnectorItems();
 
-	return nullptr;
+	if (connectors.isEmpty()) return nullptr;
+
+	return connectors.first();
 }
 
 
@@ -1090,7 +1060,7 @@ bool ItemBase::hasConnectors() {
 
 bool ItemBase::hasNonConnectors() {
 	foreach (QGraphicsItem * childItem, childItems()) {
-		if (dynamic_cast<NonConnectorItem *>(childItem) != nullptr) return true;
+		if (dynamic_cast<NonConnectorItem *>(childItem)) return true;
 	}
 
 	return false;
@@ -1861,10 +1831,6 @@ const QString & ItemBase::moduleID() {
 	return ___emptyString___;
 }
 
-bool ItemBase::moveLock() {
-	return m_moveLock;
-}
-
 void ItemBase::setMoveLock(bool moveLock)
 {
 	m_moveLock = moveLock;
@@ -1975,15 +1941,20 @@ bool ItemBase::sceneEvent(QEvent *event)
 	return QGraphicsSvgItem::sceneEvent(event);
 }
 
-const QList<ConnectorItem *> & ItemBase::cachedConnectorItems()
+void ItemBase::populateEmptyCachedConnectorItems() 
 {
 	if (m_cachedConnectorItems.isEmpty()) {
-		foreach (QGraphicsItem * childItem, childItems()) {
-			ConnectorItem * connectorItem = dynamic_cast<ConnectorItem *>(childItem);
-			if (connectorItem != nullptr) m_cachedConnectorItems.append(connectorItem);
-		}
+		childItemsAccept<ConnectorItem>([this](ConnectorItem* item) {
+					m_cachedConnectorItems.append(item);
+					return false;
+				});
 	}
+}
 
+
+const QList<ConnectorItem *> & ItemBase::cachedConnectorItems()
+{
+	populateEmptyCachedConnectorItems();
 	return m_cachedConnectorItems;
 }
 
@@ -2191,12 +2162,22 @@ bool ItemBase::makeLocalModifications(QByteArray &, const QString & ) {
 	return false;
 }
 
-void ItemBase::showConnectors(const QStringList & connectorIDs) {
-	foreach (ConnectorItem * connectorItem, cachedConnectorItems()) {
-		if (connectorIDs.contains(connectorItem->connectorSharedID())) {
-			connectorItem->setVisible(true);
-		}
+bool ItemBase::cachedConnectorItemsAccept(std::function<bool(ConnectorItem*)> fn) {
+	bool stop = false;
+	foreach (ConnectorItem* connectorItem, cachedConnectorItems()) {
+		stop = fn(connectorItem);
+		if (stop) break;
 	}
+	return stop;
+}
+
+void ItemBase::showConnectors(const QStringList & connectorIDs) {
+	cachedConnectorItemsAccept([&connectorIDs](ConnectorItem* item) {
+				if (connectorIDs.contains(item->connectorSharedID())) {
+					item->setVisible(true);
+				}
+				return false;
+			});
 }
 
 void ItemBase::setItemIsSelectable(bool selectable) {
@@ -2217,10 +2198,10 @@ void ItemBase::addSubpart(ItemBase * sub)
 	sub->debugInfo("\t");
 	m_subparts.append(sub);
 	sub->setSuperpart(this);
-	foreach (ConnectorItem * connectorItem, sub->cachedConnectorItems()) {
+	sub->cachedConnectorItemsAccept([this](ConnectorItem* connectorItem) {
 		Bus * subbus = connectorItem->bus();
 		Connector * subconnector = nullptr;
-		if (subbus == nullptr) {
+		if (!subbus) {
 			subconnector = connectorItem->connector();
 			if (subconnector) {
 				subbus = new Bus(nullptr, nullptr);
@@ -2233,7 +2214,7 @@ void ItemBase::addSubpart(ItemBase * sub)
 			if (subbus) subbus->addSubConnector(connector);
 			if (subconnector) {
 				Bus * bus = connector->bus();
-				if (bus == nullptr) {
+				if (!bus) {
 					bus = new Bus(nullptr, nullptr);
 					connector->setBus(bus);
 				}
@@ -2241,7 +2222,8 @@ void ItemBase::addSubpart(ItemBase * sub)
 				bus->addSubConnector(subconnector);
 			}
 		}
-	}
+		return false;
+	});
 }
 
 void ItemBase::setSuperpart(ItemBase * super) {

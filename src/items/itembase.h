@@ -33,10 +33,23 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include <QMap>
 #include <QTimer>
 #include <QCursor>
+#include <functional>
 
 #include "../viewgeometry.h"
 #include "../viewlayer.h"
 #include "../utils/misc.h"
+
+#if __cplusplus < 201703L
+namespace std 
+{
+template<typename Base, typename Derived>
+constexpr bool is_base_of_v = is_base_of<Base, Derived>::value;
+
+} // end namespace std
+#endif
+
+template<bool condition>
+using ValidWhen = std::enable_if_t<condition, int>;
 
 class ConnectorItem;
 
@@ -89,7 +102,7 @@ public:
 	virtual void transformItem(const QTransform &, bool includeRatsnest);
 	virtual void transformItem2(const QMatrix &);
 	virtual void removeLayerKin();
-	ViewLayer::ViewID viewID();
+	constexpr ViewLayer::ViewID viewID() const noexcept { return m_viewID; }
 	QString & viewIDName();
 	constexpr ViewLayer::ViewLayerID viewLayerID() const noexcept { return m_viewLayerID; }
 	void setViewLayerID(ViewLayer::ViewLayerID, const LayerHash & viewLayers);
@@ -101,10 +114,10 @@ public:
 	virtual void busConnectorItems(Bus * bus, ConnectorItem *, QList<ConnectorItem *> & items);
 	virtual void setHidden(bool hidden);
 	virtual void setLayerHidden(bool hidden);
-	bool hidden();
-	bool layerHidden();
+	constexpr bool hidden() const noexcept { return m_hidden; }
+	constexpr bool layerHidden() const noexcept { return m_layerHidden; }
 	virtual void setInactive(bool inactivate);
-	bool inactive();
+	constexpr bool inactive() const noexcept { return m_inactive; }
 	ConnectorItem * findConnectorItemWithSharedID(const QString & connectorID, ViewLayer::ViewLayerPlacement);
 	ConnectorItem * findConnectorItemWithSharedID(const QString & connectorID);
 	void updateConnections(ConnectorItem *, bool includeRatsnest, QList<ConnectorItem *> & already);
@@ -187,7 +200,7 @@ public:
 	virtual void calcRotation(QTransform & rotation, QPointF center, ViewGeometry &);
 	void updateConnectors();
 	const QString & moduleID();
-	bool moveLock();
+	constexpr bool moveLock() const noexcept { return m_moveLock; }
 	virtual void setMoveLock(bool);
 	void debugInfo(const QString & msg) const;
 	void debugInfo2(const QString & msg) const;
@@ -203,9 +216,37 @@ public:
 	void killRubberBandLeg();
 	bool sceneEvent(QEvent *event);
 	void clearConnectorItemCache();
+    /**
+     * Traverse through the set of children attached to this item, attempt to
+     * convert it to the target type and if successful call the provided
+     * function on it. If the provided function returns true then processing
+     * will stop. False will be returned if the entire list was processed
+     * @tparam T the type to attempt a child conversion on
+     * @param fn The function to apply to a successfully converted child return true to terminate early
+     * @return true if processing stopped early
+     */
+    template<typename T, ValidWhen<std::is_base_of_v<QGraphicsItem, std::remove_pointer_t<std::decay_t<T>>>> = 0> 
+    bool childItemsAccept(std::function<bool(T*)> fn) {
+        bool stop = false;
+        foreach (QGraphicsItem* childItem, childItems()) {
+            T* item = dynamic_cast<T*>(childItem);
+            if (item) {
+                stop = fn(item);
+            }
+            if (stop) {
+                break;
+            }
+        }
+        return stop;
+    }
+    bool cachedConnectorItemsAccept(std::function<bool(ConnectorItem*)> fn);
+    void populateEmptyCachedConnectorItems();
+    /// @todo fix these two methods as they have very different logic based on the context of the call.
 	const QList<ConnectorItem *> & cachedConnectorItems();
 	const QList<ConnectorItem *> & cachedConnectorItemsConst() const;
-	bool inHover();
+	constexpr bool inHover() const noexcept {
+        return (!m_inactive && (m_connectorHoverCount > 0 || m_hoverCount > 0 || m_connectorHoverCount2 > 0));
+    }
 	virtual QRectF boundingRectWithoutLegs() const;
 	QRectF boundingRect() const;
 	virtual QPainterPath hoverShape() const;
