@@ -37,8 +37,22 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include <QMultiHash>
 #include <QMessageBox>
 
-#define VOLTAGE_HASH_CONVERSION 1000000
-#define FROMVOLTAGE(v) ((long) (v * VOLTAGE_HASH_CONVERSION))
+#if __cplusplus < 201703L
+// std::is_convertible_v is very useful but is found in C++17 and later by
+// default
+namespace std {
+template<typename From, typename To>
+constexpr auto is_convertible_v = is_convertible<From, To>::value;
+} // end namespace std
+#endif
+
+constexpr auto VOLTAGE_HASH_CONVERSION = 1000000;
+
+template<typename T, std::enable_if<std::is_convertible_v<T, long>, int> = 0>
+constexpr long fromVoltage(T v) noexcept 
+{
+    return static_cast<long>(v * VOLTAGE_HASH_CONVERSION);
+}
 
 static QMultiHash<long, QPointer<ConnectorItem> > LocalVoltages;			// Qt doesn't do Hash keys with double
 static QMultiHash<QString, QPointer<ConnectorItem> > LocalNetLabels;
@@ -152,8 +166,8 @@ void SymbolPaletteItem::removeMeFromBus(double v) {
 				//connectorItem->debugInfo(QString("remove %1").arg(useVoltage(connectorItem)));
 
 				bool gotOne = LocalGrounds.removeOne(connectorItem);
-				int count = LocalVoltages.remove(FROMVOLTAGE(v), connectorItem);
-				LocalVoltages.remove(FROMVOLTAGE(v), NULL);
+				int count = LocalVoltages.remove(fromVoltage(v), connectorItem);
+				LocalVoltages.remove(fromVoltage(v), NULL);
 
 
 				if (count == 0 && !gotOne) {
@@ -190,7 +204,7 @@ ConnectorItem* SymbolPaletteItem::newConnectorItem(Connector *connector)
 		//connectorItem->debugInfo("new ground insert");
 	}
 	else {
-		LocalVoltages.insert(FROMVOLTAGE(useVoltage(connectorItem)), connectorItem);
+		LocalVoltages.insert(fromVoltage(useVoltage(connectorItem)), connectorItem);
 		//connectorItem->debugInfo(QString("new voltage insert %1").arg(useVoltage(connectorItem)));
 	}
 	return connectorItem;
@@ -213,7 +227,7 @@ void SymbolPaletteItem::busConnectorItems(Bus * bus, ConnectorItem * fromConnect
 		mitems.append(LocalGrounds);
 	}
 	else {
-		mitems.append(LocalVoltages.values(FROMVOLTAGE(m_voltage)));
+		mitems.append(LocalVoltages.values(fromVoltage(m_voltage)));
 	}
 	foreach (ConnectorItem * connectorItem, mitems) {
 		if (connectorItem == NULL) continue;
@@ -283,7 +297,7 @@ void SymbolPaletteItem::setVoltage(double v) {
 
 			}
 			else {
-				LocalVoltages.insert(FROMVOLTAGE(v), connectorItem);
+				LocalVoltages.insert(fromVoltage(v), connectorItem);
 				//connectorItem->debugInfo(QString("voltage insert %1").arg(useVoltage(connectorItem)));
 			}
 		}
