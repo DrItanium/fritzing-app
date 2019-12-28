@@ -52,13 +52,13 @@ protected:
 		MovingBack
 	};
 
-	volatile MovingState m_movingState;
-	int m_endX;
-	int m_endY;
-	int m_startX;
-	int m_startY;
+	volatile MovingState m_movingState = MovingState::MovingOut;
+	int m_endX = 0;
+	int m_endY = 0;
+	int m_startX = 0;
+	int m_startY = 0;
 	QTimer m_animationTimer;
-	int m_counter;
+	int m_counter = 0;
 };
 
 #endif

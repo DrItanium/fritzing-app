@@ -28,17 +28,17 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 class BezierDisplay {
 
 public:
-	BezierDisplay();
+	BezierDisplay() = default;
 	~BezierDisplay();
 
 	void initDisplay(QGraphicsItem * master, Bezier *);
 	void updateDisplay(QGraphicsItem * master, Bezier *);
 
 protected:
-	QGraphicsLineItem * m_itemL0;
-	QGraphicsLineItem * m_itemL1;
-	QGraphicsEllipseItem * m_itemE0;
-	QGraphicsEllipseItem * m_itemE1;
+	QGraphicsLineItem * m_itemL0 = nullptr;
+	QGraphicsLineItem * m_itemL1 = nullptr;
+	QGraphicsEllipseItem * m_itemE0 = nullptr;
+	QGraphicsEllipseItem * m_itemE1 = nullptr;
 };
 
 #endif

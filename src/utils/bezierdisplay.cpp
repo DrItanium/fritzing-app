@@ -28,12 +28,6 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include <QGraphicsScene>
 #include <QApplication>
 
-BezierDisplay::BezierDisplay()
-{
-	m_itemL0 = m_itemL1 = NULL;
-	m_itemE0 = m_itemE1 = NULL;
-}
-
 BezierDisplay::~BezierDisplay()
 {
 	//DebugDialog::debug("removing bezier display");
@@ -45,22 +39,25 @@ BezierDisplay::~BezierDisplay()
 		m_itemL1->scene()->removeItem(m_itemL1);
 		delete m_itemL1;
 	}
-	//if (m_itemE0) {
-	//	m_itemE0->scene()->removeItem(m_itemE0);
-	//	delete m_itemE0;
-	//}
-	//if (m_itemE1) {
-	//	m_itemE1->scene()->removeItem(m_itemE1);
-	//	delete m_itemE1;
-	//}
+    /// @todo won't this disabled code prevent a leak?
+#if 0
+	if (m_itemE0) {
+		m_itemE0->scene()->removeItem(m_itemE0);
+		delete m_itemE0;
+	}
+	if (m_itemE1) {
+		m_itemE1->scene()->removeItem(m_itemE1);
+		delete m_itemE1;
+	}
+#endif
 }
 
 void BezierDisplay::initDisplay(QGraphicsItem * master, Bezier *bezier)
 {
 	//DebugDialog::debug("adding bezier display");
 
-	static int activeColor =   0xffffff;
-	static int inactiveColor = 0xb0b0b0;
+	static constexpr int activeColor   = 0xffffff;
+	static constexpr int inactiveColor = 0xb0b0b0;
 
 	QPen pen;
 	pen.setWidth(0);
@@ -105,12 +102,12 @@ void BezierDisplay::initDisplay(QGraphicsItem * master, Bezier *bezier)
 
 void BezierDisplay::updateDisplay(QGraphicsItem * master, Bezier *bezier)
 {
-	if (m_itemL0 == NULL) return;
-	if (m_itemL1 == NULL) return;
-	//if (m_itemE0 == NULL) return;
-	//if (m_itemE1 == NULL) return;
+	if (!m_itemL0) return;
+	if (!m_itemL1) return;
+	//if (!m_itemE0) return;
+	//if (!m_itemE1) return;
 
-	if (bezier == NULL || bezier->isEmpty()) {
+	if (!bezier || bezier->isEmpty()) {
 		m_itemL0->setVisible(false);
 		m_itemL1->setVisible(false);
 		//m_itemE0->setVisible(false);
