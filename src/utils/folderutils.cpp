@@ -60,7 +60,7 @@ FolderUtils::FolderUtils() {
 
 }
 
-FolderUtils* singleton() noexcept 
+FolderUtils* FolderUtils::singleton() noexcept 
 {
 	static FolderUtils* _singleton = nullptr;
 	if (!_singleton) {
