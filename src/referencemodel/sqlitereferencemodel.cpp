@@ -53,15 +53,13 @@ void debugError(bool result, QSqlQuery & query) {
 static ModelPart * DebugModelPart = nullptr;
 
 void debugExec(const QString & msg, QSqlQuery & query) {
-    QString str = "SQLITE: " + msg 
-        + "\n\t" + query.lastQuery() 
-        + "\n\t ERROR DRIVER: " + query.lastError().driverText()
-        + "\n\t ERROR DB: " + query.lastError().databaseText() 
-        + "\n\t moduleid:";
-    if (DebugModelPart) {
-        str += DebugModelPart->moduleID();
-    }
-	DebugDialog::debug(str);
+	DebugDialog::debug(
+	    "SQLITE: " + msg + "\n"
+	    "\t "+ query.lastQuery() + "\n"
+	    "\t ERROR DRIVER: "+ query.lastError().driverText() + "\n"
+	    "\t ERROR DB: " + query.lastError().databaseText() + "\n"
+	    "\t moduleid:" + (DebugModelPart == nullptr ? "" : DebugModelPart->moduleID()) + ""
+	);
 	QMap<QString, QVariant> map = query.boundValues();
 	foreach (QString name, map.keys()) {
 		DebugDialog::debug(QString("\t%1:%2").arg(name).arg(map.value(name).toString()));
@@ -70,7 +68,6 @@ void debugExec(const QString & msg, QSqlQuery & query) {
 
 void killConnectors(QVector<Connector *> & connectors) {
 	foreach (Connector * connector, connectors) {
-        /// @todo make this method less aware of the internals of connector, too many things can go wrong!
 		delete connector->connectorShared();
 		delete connector;
 	}
@@ -361,7 +358,7 @@ bool SqliteReferenceModel::loadFromDB(QSqlDatabase & keep_db, QSqlDatabase & db)
 	int connectorCount = query.value(0).toInt();
 	if (connectorCount == 0) return false;
 
-	QVector<Connector *> connectors(connectorCount + 1, nullptr);
+	QVector<Connector *> connectors(connectorCount + 1, NULL);
 
 	query = db.exec("SELECT id, connectorid, type, name, description, replacedby, part_id FROM connectors");
 	debugError(query.isActive(), query);
@@ -424,7 +421,7 @@ bool SqliteReferenceModel::loadFromDB(QSqlDatabase & keep_db, QSqlDatabase & db)
 	int busCount = query.value(0).toInt();
 	if (busCount == 0) return false;
 
-	QVector<BusShared *> buses(busCount + 1, nullptr);
+	QVector<BusShared *> buses(busCount + 1, NULL);
 	QHash<BusShared *, qulonglong> busids;
 
 	query = db.exec("SELECT id, name, part_id FROM buses");
@@ -494,7 +491,7 @@ bool SqliteReferenceModel::loadFromDB(QSqlDatabase & keep_db, QSqlDatabase & db)
 		}
 	}
 
-	if (!m_root) {
+	if (m_root == NULL) {
 		m_root = new ModelPart();
 	}
 	foreach (ModelPart * modelPart, m_partHash.values()) {
@@ -654,15 +651,17 @@ void SqliteReferenceModel::deleteConnection() {
 
 ModelPart *SqliteReferenceModel::loadPart(const QString & path, bool update) {
 	ModelPart *modelPart = PaletteModel::loadPart(path, update);
-    if (modelPart) addPart(modelPart, update);
+	if (modelPart == NULL) return modelPart;
+
+	if (!m_init) addPart(modelPart, update);
 	return modelPart;
 }
 
 ModelPart *SqliteReferenceModel::retrieveModelPart(const QString &moduleID) {
 	if (moduleID.isEmpty()) {
-		return nullptr;
+		return NULL;
 	}
-	return m_partHash.value(moduleID, nullptr);
+	return m_partHash.value(moduleID, NULL);
 }
 
 QString SqliteReferenceModel::retrieveModuleIdWith(const QString &family, const QString &propertyName, bool closestMatch) {
@@ -778,9 +777,10 @@ QString SqliteReferenceModel::getClosestMatch(const QString &family, const QMult
 	return result;
 }
 
-int SqliteReferenceModel::countPropsInCommon(const QString & /* family */, const QMultiHash<QString, QString> &properties, const ModelPart *part2) {
+int SqliteReferenceModel::countPropsInCommon(const QString &family, const QMultiHash<QString, QString> &properties, const ModelPart *part2) {
+	Q_UNUSED(family)
 
-	if (!part2) {
+	if (part2 == NULL) {
 		DebugDialog::debug("countPropsInCommon failure");
 		return 0;
 	}
@@ -799,9 +799,14 @@ int SqliteReferenceModel::countPropsInCommon(const QString & /* family */, const
 	return result;
 }
 
+bool SqliteReferenceModel::lastWasExactMatch() {
+	return m_lastWasExactMatch;
+}
+
 bool SqliteReferenceModel::addPartAux(ModelPart * newModel, bool fullLoad) {
 	try {
-		return insertPart(newModel, fullLoad);
+		bool result = insertPart(newModel, fullLoad);
+		return result;
 	}
 	catch (const char * msg) {
 		DebugDialog::debug(msg);
@@ -854,7 +859,7 @@ bool SqliteReferenceModel::removePartFromDataBase(const QString & moduleId) {
 ModelPart * SqliteReferenceModel::reloadPart(const QString & path, const QString & moduleID) {
 	m_partHash.remove(moduleID);
 	ModelPart *modelPart = PaletteModel::loadPart(path, false);
-	if (modelPart == nullptr) return modelPart;
+	if (modelPart == NULL) return modelPart;
 
 	updatePart(modelPart);
 	return modelPart;
@@ -981,7 +986,7 @@ bool SqliteReferenceModel::insertPart(ModelPart * modelPart, bool fullLoad) {
 		                    .arg(modelPart->path()).arg(modelPart->moduleID());
 	}
 
-	DebugModelPart = nullptr;
+	DebugModelPart = NULL;
 	return true;
 }
 
@@ -1183,6 +1188,10 @@ void SqliteReferenceModel::recordProperty(const QString &name, const QString &va
 	m_recordedProperties.insert(name,value);
 }
 
+bool SqliteReferenceModel::swapEnabled() const {
+	return m_swappingEnabled;
+}
+
 bool SqliteReferenceModel::containsModelPart(const QString & moduleID) {
 	return partId(moduleID) != NO_ID;
 }
@@ -1230,7 +1239,6 @@ QString SqliteReferenceModel::partTitle(const QString & moduleID) {
 void SqliteReferenceModel::killParts()
 {
 	foreach (ModelPart * modelPart, m_partHash.values()) {
-        /// @todo clean this up to be far less aware of other class internals
 		delete modelPart;
 	}
 	m_partHash.clear();
@@ -1343,6 +1351,10 @@ void SqliteReferenceModel::createMoreIndexes(QSqlDatabase & db)
 
 void SqliteReferenceModel::setSha(const QString & sha) {
 	m_sha = sha;
+}
+
+const QString & SqliteReferenceModel::sha() const {
+	return m_sha;
 }
 
 bool SqliteReferenceModel::removeViewImages(qulonglong partId) {

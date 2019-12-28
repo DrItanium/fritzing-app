@@ -33,7 +33,7 @@ class SqliteReferenceModel : public ReferenceModel {
 	Q_OBJECT
 public:
 	SqliteReferenceModel() = default;
-	~SqliteReferenceModel() override;
+	~SqliteReferenceModel();
 
 	bool loadAll(const QString & databaseName, bool fullLoad, bool dbExists);
 	bool loadFromDB(const QString & databaseName);
@@ -46,7 +46,7 @@ public:
 	bool updatePart(ModelPart * newModel);
 	ModelPart * addPart(QString newPartPath, bool addToReference, bool updateIdAlreadyExists);
 
-	bool swapEnabled() const noexcept { return m_swappingEnabled; }
+	bool swapEnabled() const;
 	bool containsModelPart(const QString & moduleID);
 
 	QString partTitle(const QString & moduleID);
@@ -55,9 +55,9 @@ public:
 	void recordProperty(const QString &name, const QString &value);
 	QString retrieveModuleIdWith(const QString &family, const QString &propertyName, bool closestMatch);
 	QString retrieveModuleId(const QString &family, const QMultiHash<QString /*name*/, QString /*value*/> &properties, const QString &propertyName, bool closestMatch);
-	bool lastWasExactMatch() override { return m_lastWasExactMatch; }
+	bool lastWasExactMatch();
 	void setSha(const QString & sha);
-	const QString & sha() const noexcept { return m_sha; }
+	const QString & sha() const;
 
 protected:
 	void initParts(bool dbExists);
