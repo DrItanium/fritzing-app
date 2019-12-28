@@ -28,7 +28,7 @@ class ClickableLabel : public QLabel {
 	Q_OBJECT
 
 public:
-	ClickableLabel(const QString & text = "", QWidget * parent = NULL);
+	ClickableLabel(const QString & text = "", QWidget * parent = nullptr);
 
 protected:
 	void mousePressEvent(QMouseEvent * e);
