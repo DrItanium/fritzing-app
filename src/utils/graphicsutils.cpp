@@ -29,45 +29,11 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 void GraphicsUtils::distanceFromLine(double cx, double cy, double ax, double ay, double bx, double by,
                                      double & dx, double & dy, double &distanceSegment, bool & atEndpoint)
 {
-
-	// http://www.codeguru.com/forum/showthread.php?t=194400
-
-	//
-	// find the distance from the point (cx,cy) to the line
-	// determined by the points (ax,ay) and (bx,by)
-	//
-
-	double r_numerator = (cx-ax)*(bx-ax) + (cy-ay)*(by-ay);
-	double r_denomenator = (bx-ax)*(bx-ax) + (by-ay)*(by-ay);
-	double r = r_numerator / r_denomenator;
-
-	if ( (r >= 0) && (r <= 1) )
-	{
-		dx = ax + r*(bx-ax);
-		dy = ay + r*(by-ay);
-		distanceSegment = (cx-dx)*(cx-dx) + (cy-dy)*(cy-dy);
-		atEndpoint = false;
-	}
-	else
-	{
-		atEndpoint = true;
-		double dist1 = (cx-ax)*(cx-ax) + (cy-ay)*(cy-ay);
-		double dist2 = (cx-bx)*(cx-bx) + (cy-by)*(cy-by);
-		if (dist1 < dist2)
-		{
-			dx = ax;
-			dy = ay;
-			distanceSegment = dist1;
-		}
-		else
-		{
-			dx = bx;
-			dy = by;
-			distanceSegment = dist2;
-		}
-	}
-
-	return;
+    auto result = distanceFromLine(cx, cy, ax, ay, bx, by);
+    dx = std::get<0>(result);
+    dy = std::get<1>(result);
+    distanceSegment = std::get<2>(result);
+    atEndpoint = std::get<3>(result);
 }
 
 struct PD {
@@ -177,7 +143,7 @@ bool GraphicsUtils::loadTransform(const QDomElement & transformElement, QTransfo
 	return true;
 }
 
-double GraphicsUtils::getNearestOrdinate(double ordinate, double units) {
+double GraphicsUtils::getNearestOrdinate(double ordinate, double units) noexcept {
 	double lo = qFloor(ordinate / units) * units;
 	double hi = qCeil(ordinate / units) * units;
 	return (qAbs(lo - ordinate) <= qAbs(hi - ordinate)) ? lo : hi;
@@ -355,7 +321,7 @@ constexpr bool almostEqual(qreal a, qreal b) noexcept {
 }
 
 bool GraphicsUtils::isFlipped(const QMatrix & matrix, double & rotation) {
-	static qreal halfSqrt2 = 0.7071;
+	static constexpr qreal halfSqrt2 = 0.7071;
 
 	// flipped means flipped horizontally (around the vertical axis)
 	// rotation values are ccw and upright is zero
