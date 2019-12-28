@@ -28,7 +28,6 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include <QSqlDriver>
 #include <QDebug>
 #include <limits>
-#include <sstream>
 
 #include "sqlitereferencemodel.h"
 #include "../debugdialog.h"
