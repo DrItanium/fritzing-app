@@ -358,7 +358,7 @@ bool SqliteReferenceModel::loadFromDB(QSqlDatabase & keep_db, QSqlDatabase & db)
 	int connectorCount = query.value(0).toInt();
 	if (connectorCount == 0) return false;
 
-	QVector<Connector *> connectors(connectorCount + 1, NULL);
+	QVector<Connector *> connectors(connectorCount + 1, nullptr);
 
 	query = db.exec("SELECT id, connectorid, type, name, description, replacedby, part_id FROM connectors");
 	debugError(query.isActive(), query);
@@ -421,7 +421,7 @@ bool SqliteReferenceModel::loadFromDB(QSqlDatabase & keep_db, QSqlDatabase & db)
 	int busCount = query.value(0).toInt();
 	if (busCount == 0) return false;
 
-	QVector<BusShared *> buses(busCount + 1, NULL);
+	QVector<BusShared *> buses(busCount + 1, nullptr);
 	QHash<BusShared *, qulonglong> busids;
 
 	query = db.exec("SELECT id, name, part_id FROM buses");
@@ -491,7 +491,7 @@ bool SqliteReferenceModel::loadFromDB(QSqlDatabase & keep_db, QSqlDatabase & db)
 		}
 	}
 
-	if (m_root == NULL) {
+	if (!m_root) {
 		m_root = new ModelPart();
 	}
 	foreach (ModelPart * modelPart, m_partHash.values()) {
@@ -651,17 +651,19 @@ void SqliteReferenceModel::deleteConnection() {
 
 ModelPart *SqliteReferenceModel::loadPart(const QString & path, bool update) {
 	ModelPart *modelPart = PaletteModel::loadPart(path, update);
-	if (modelPart == NULL) return modelPart;
-
-	if (!m_init) addPart(modelPart, update);
+    if (modelPart) {
+        if (!m_init) {
+            addPart(modelPart, update);
+        }
+    }
 	return modelPart;
 }
 
 ModelPart *SqliteReferenceModel::retrieveModelPart(const QString &moduleID) {
 	if (moduleID.isEmpty()) {
-		return NULL;
+		return nullptr;
 	}
-	return m_partHash.value(moduleID, NULL);
+	return m_partHash.value(moduleID, nullptr);
 }
 
 QString SqliteReferenceModel::retrieveModuleIdWith(const QString &family, const QString &propertyName, bool closestMatch) {
@@ -780,7 +782,7 @@ QString SqliteReferenceModel::getClosestMatch(const QString &family, const QMult
 int SqliteReferenceModel::countPropsInCommon(const QString &family, const QMultiHash<QString, QString> &properties, const ModelPart *part2) {
 	Q_UNUSED(family)
 
-	if (part2 == NULL) {
+	if (!part2) {
 		DebugDialog::debug("countPropsInCommon failure");
 		return 0;
 	}
@@ -859,7 +861,7 @@ bool SqliteReferenceModel::removePartFromDataBase(const QString & moduleId) {
 ModelPart * SqliteReferenceModel::reloadPart(const QString & path, const QString & moduleID) {
 	m_partHash.remove(moduleID);
 	ModelPart *modelPart = PaletteModel::loadPart(path, false);
-	if (modelPart == NULL) return modelPart;
+	if (!modelPart) return modelPart;
 
 	updatePart(modelPart);
 	return modelPart;
@@ -986,7 +988,7 @@ bool SqliteReferenceModel::insertPart(ModelPart * modelPart, bool fullLoad) {
 		                    .arg(modelPart->path()).arg(modelPart->moduleID());
 	}
 
-	DebugModelPart = NULL;
+	DebugModelPart = nullptr;
 	return true;
 }
 
