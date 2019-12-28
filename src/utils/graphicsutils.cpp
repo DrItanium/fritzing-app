@@ -239,75 +239,13 @@ QRectF GraphicsUtils::getRect(const QPolygonF & poly)
 bool GraphicsUtils::liangBarskyLineClip(double x1, double y1, double x2, double y2, double wxmin, double wxmax, double wymin, double wymax,
                                         double & x11, double & y11, double & x22, double & y22)
 {
-	double p1 = -(x2 - x1 );
-	double q1 = x1 - wxmin;
-	double p2 = ( x2 - x1 );
-	double q2 = wxmax - x1;
-	double p3 = - ( y2 - y1 );
-	double q3 = y1 - wymin;
-	double p4 = ( y2 - y1 );
-	double q4 = wymax - y1;
-
-	x11 = x1;
-	y11 = y1;
-	x22 = x2;
-	y22 = y2;
-
-	if( ( ( p1 == 0.0 ) && ( q1 < 0.0 ) ) ||
-	        ( ( p2 == 0.0 ) && ( q2 < 0.0 ) ) ||
-	        ( ( p3 == 0.0 ) && ( q3 < 0.0 ) ) ||
-	        ( ( p4 == 0.0 ) && ( q4 < 0.0 ) ) )
-	{
-		return false;
-	}
-
-	double u1 = 0.0, u2 = 1.0;
-
-	if( p1 != 0.0 )
-	{
-		double r1 = q1 /p1 ;
-		if( p1 < 0 )
-			u1 = qMax(r1, u1 );
-		else
-			u2 = qMin(r1, u2 );
-	}
-	if( p2 != 0.0 )
-	{
-		double r2 = q2 /p2 ;
-		if( p2 < 0 )
-			u1 = qMax(r2, u1 );
-		else
-			u2 = qMin(r2, u2 );
-
-	}
-	if( p3 != 0.0 )
-	{
-		double r3 = q3 /p3 ;
-		if( p3 < 0 )
-			u1 = qMax(r3, u1 );
-		else
-			u2 = qMin(r3, u2 );
-	}
-	if( p4 != 0.0 )
-	{
-		double r4 = q4 /p4 ;
-		if( p4 < 0 )
-			u1 = qMax(r4, u1 );
-		else
-			u2 = qMin(r4, u2 );
-	}
-
-	if( u1 > u2 ) {
-		return false;
-	}
-
-	x11 = x1 + u1 * ( x2 - x1 ) ;
-	y11 = y1 + u1 * ( y2 - y1 ) ;
-
-	x22 = x1 + u2 * ( x2 - x1 );
-	y22 = y1 + u2 * ( y2 - y1 );
-
-	return true;
+    // unpack the result
+    auto result = liangBarskyLineClip(x1, y1, x2, y2, wxmin, wxmax, wymin, wymax);
+    x11 = std::get<1>(result);
+    y11 = std::get<2>(result);
+    x22 = std::get<3>(result);
+    y22 = std::get<4>(result);
+    return std::get<0>(result);
 }
 
 QString GraphicsUtils::toHtmlImage(QPixmap *pixmap, const char* format) {

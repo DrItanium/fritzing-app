@@ -32,6 +32,7 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
 #include <QPixmap>
+#include <tuple>
 
 class GraphicsUtils
 {
@@ -74,9 +75,85 @@ public:
 	static bool isRect(const QPolygonF & poly);
 	static QRectF getRect(const QPolygonF & poly);
 	static void shortenLine(QPointF & p1, QPointF & p2, double d1, double d2);
+    using LiangBarskyLineClipResults = std::tuple<bool, double, double, double, double>;
 	static bool liangBarskyLineClip(double x1, double y1, double x2, double y2,
 	                                double wxmin, double wxmax, double wymin, double wymax,
 	                                double & x11, double & y11, double & x22, double & y22);
+    /**
+     * Non destructive version of the liang-barskey line clip algorithm
+     */
+    static constexpr LiangBarskyLineClipResults liangBarskyLineClip(double x1, double y1, double x2, double y2,
+	                                double wxmin, double wxmax, double wymin, double wymax) noexcept {
+        double p1 = -(x2 - x1 );
+        double q1 = x1 - wxmin;
+        double p2 = ( x2 - x1 );
+        double q2 = wxmax - x1;
+        double p3 = - ( y2 - y1 );
+        double q3 = y1 - wymin;
+        double p4 = ( y2 - y1 );
+        double q4 = wymax - y1;
+
+        double x11 = x1;
+        double y11 = y1;
+        double x22 = x2;
+        double y22 = y2;
+
+        if( ( ( p1 == 0.0 ) && ( q1 < 0.0 ) ) ||
+                ( ( p2 == 0.0 ) && ( q2 < 0.0 ) ) ||
+                ( ( p3 == 0.0 ) && ( q3 < 0.0 ) ) ||
+                ( ( p4 == 0.0 ) && ( q4 < 0.0 ) ) )
+        {
+            return std::make_tuple(false, x11, y11, x22, y22);
+        }
+
+        double u1 = 0.0, u2 = 1.0;
+
+        if( p1 != 0.0 )
+        {
+            double r1 = q1 /p1 ;
+            if( p1 < 0 )
+                u1 = qMax(r1, u1 );
+            else
+                u2 = qMin(r1, u2 );
+        }
+        if( p2 != 0.0 )
+        {
+            double r2 = q2 /p2 ;
+            if( p2 < 0 )
+                u1 = qMax(r2, u1 );
+            else
+                u2 = qMin(r2, u2 );
+
+        }
+        if( p3 != 0.0 )
+        {
+            double r3 = q3 /p3 ;
+            if( p3 < 0 )
+                u1 = qMax(r3, u1 );
+            else
+                u2 = qMin(r3, u2 );
+        }
+        if( p4 != 0.0 )
+        {
+            double r4 = q4 /p4 ;
+            if( p4 < 0 )
+                u1 = qMax(r4, u1 );
+            else
+                u2 = qMin(r4, u2 );
+        }
+
+        if( u1 > u2 ) {
+            return std::make_tuple(false, x11, y11, x22, y22);
+        }
+
+        x11 = x1 + u1 * ( x2 - x1 ) ;
+        y11 = y1 + u1 * ( y2 - y1 ) ;
+
+        x22 = x1 + u2 * ( x2 - x1 );
+        y22 = y1 + u2 * ( y2 - y1 );
+
+        return std::make_tuple(true, x11, y11, x22, y22);
+    }
 	static QString toHtmlImage(QPixmap *pixmap, const char* format = "PNG");
 	static QPainterPath shapeFromPath(const QPainterPath &path, const QPen &pen, double shapeStrokeWidth, bool includeOriginalPath);
 	static void qt_graphicsItem_highlightSelected(QPainter *painter, const QStyleOptionGraphicsItem *option, const QRectF & boundingRect, const QPainterPath & path);
