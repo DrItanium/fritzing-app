@@ -32,8 +32,8 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 class SqliteReferenceModel : public ReferenceModel {
 	Q_OBJECT
 public:
-	SqliteReferenceModel();
-	~SqliteReferenceModel();
+	SqliteReferenceModel() = default;
+	~SqliteReferenceModel() override;
 
 	bool loadAll(const QString & databaseName, bool fullLoad, bool dbExists);
 	bool loadFromDB(const QString & databaseName);
@@ -46,7 +46,7 @@ public:
 	bool updatePart(ModelPart * newModel);
 	ModelPart * addPart(QString newPartPath, bool addToReference, bool updateIdAlreadyExists);
 
-	bool swapEnabled() const;
+	bool swapEnabled() const noexcept { return m_swappingEnabled; }
 	bool containsModelPart(const QString & moduleID);
 
 	QString partTitle(const QString & moduleID);
@@ -55,9 +55,9 @@ public:
 	void recordProperty(const QString &name, const QString &value);
 	QString retrieveModuleIdWith(const QString &family, const QString &propertyName, bool closestMatch);
 	QString retrieveModuleId(const QString &family, const QMultiHash<QString /*name*/, QString /*value*/> &properties, const QString &propertyName, bool closestMatch);
-	bool lastWasExactMatch();
+	bool lastWasExactMatch() override { return m_lastWasExactMatch; }
 	void setSha(const QString & sha);
-	const QString & sha() const;
+	const QString & sha() const noexcept { return m_sha; }
 
 protected:
 	void initParts(bool dbExists);
@@ -100,8 +100,8 @@ protected:
 	bool removePartFromDataBase(const QString & moduleId);
 
 protected:
-	volatile bool m_swappingEnabled;
-	volatile bool m_lastWasExactMatch;
+	volatile bool m_swappingEnabled = false;
+	volatile bool m_lastWasExactMatch = true;
 	volatile bool m_keepGoing;
 	bool m_init;
 	QSqlDatabase m_database;
