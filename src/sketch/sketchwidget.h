@@ -517,8 +517,14 @@ protected:
 	virtual void viewGeometryConversionHack(ViewGeometry &, ModelPart *);
 
 protected:
-	static bool lessThan(int a, int b);
-	static bool greaterThan(int a, int b);
+    template<typename T>
+    static constexpr bool lessThan(T a, T b) noexcept {
+        return a < b;
+    }
+    template<typename T>
+    static constexpr bool greaterThan(T a, T b) noexcept {
+        return a > b;
+    }
 
 signals:
 	void itemAddedSignal(ModelPart *, ItemBase *, ViewLayer::ViewLayerPlacement, const ViewGeometry &, long id, SketchWidget * dropOrigin);

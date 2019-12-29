@@ -4467,14 +4467,6 @@ void SketchWidget::sortAnyByZ(const QList<QGraphicsItem *> & items, QList<ItemBa
 	qSort(bases.begin(), bases.end(), ItemBase::zLessThan);
 }
 
-bool SketchWidget::lessThan(int a, int b) {
-	return a < b;
-}
-
-bool SketchWidget::greaterThan(int a, int b) {
-	return a > b;
-}
-
 void SketchWidget::changeZ(QHash<long, RealPair * > triplets, double (*pairAccessor)(RealPair *) ) {
 
 	// TODO: replace scene->items
