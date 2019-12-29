@@ -4502,26 +4502,9 @@ ViewLayer::ViewLayerID SketchWidget::getWireViewLayerID(const ViewGeometry & vie
 	return m_wireViewLayerID;
 }
 
-ViewLayer::ViewLayerID SketchWidget::getRulerViewLayerID() {
-	return m_rulerViewLayerID;
-}
-
-ViewLayer::ViewLayerID SketchWidget::getPartViewLayerID() {
-	return m_partViewLayerID;
-}
-
-ViewLayer::ViewLayerID SketchWidget::getConnectorViewLayerID() {
-	return m_connectorViewLayerID;
-}
-
 ViewLayer::ViewLayerID SketchWidget::getLabelViewLayerID(ItemBase *) {
 	return ViewLayer::UnknownLayer;
 }
-
-ViewLayer::ViewLayerID SketchWidget::getNoteViewLayerID() {
-	return m_noteViewLayerID;
-}
-
 
 void SketchWidget::mousePressConnectorEvent(ConnectorItem * connectorItem, QGraphicsSceneMouseEvent * event) {
 
