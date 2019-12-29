@@ -27,27 +27,14 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include <QTextStream>
 
 
-ConnectorShared::ConnectorShared()
+ConnectorShared::ConnectorShared( const QDomElement & domElement ) :
+    m_description(domElement.firstChildElement("description").text()),
+    m_id(domElement.attribute("id", "")),
+    m_name(domElement.attribute("name", "")),
+    m_typeString(domElement.attribute("type", "")),
+    m_replacedby(domElement.attribute("replacedby", "")),
+    m_type(Connector::connectorTypeFromName(m_typeString))
 {
-	m_id = "";
-	m_name = "";
-	m_typeString = "";
-	m_type = Connector::Unknown;
-	m_description = "";
-	m_bus = NULL;
-	m_ercData = NULL;
-}
-
-ConnectorShared::ConnectorShared( const QDomElement & domElement )
-{
-	m_ercData = NULL;
-	m_id = domElement.attribute("id", "");
-	m_name = domElement.attribute("name", "");
-	m_replacedby = domElement.attribute("replacedby", "");
-	//DebugDialog::debug(QString("\tname:%1 id:%2").arg(m_name).arg(m_id));
-	m_typeString = domElement.attribute("type", "");
-	m_type = Connector::connectorTypeFromName(m_typeString);
-	m_description = domElement.firstChildElement("description").text();
 	QDomElement erc = domElement.firstChildElement("erc");
 	if (!erc.isNull()) {
 		m_ercData = new ErcData(erc);
@@ -65,8 +52,6 @@ ConnectorShared::ConnectorShared( const QDomElement & domElement )
 		}
 
 	}
-
-	m_bus = NULL;
 }
 
 ConnectorShared::~ConnectorShared() {

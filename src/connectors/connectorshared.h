@@ -34,7 +34,7 @@ class ConnectorShared : public QObject
 	Q_OBJECT
 
 public:
-	ConnectorShared();
+	ConnectorShared() = default;
 	ConnectorShared(const QDomElement & domElement);
 	~ConnectorShared();
 
@@ -74,10 +74,10 @@ protected:
 	QString m_name;
 	QString m_typeString;
 	QString m_replacedby;
-	Connector::ConnectorType m_type;
+	Connector::ConnectorType m_type = Connector::Unknown;
 	QString m_ercType;
-	class ErcData * m_ercData;
-	class BusShared * m_bus;
+	class ErcData * m_ercData = nullptr;
+	class BusShared * m_bus = nullptr;
 
 	QMultiHash<ViewLayer::ViewID, SvgIdLayer*> m_pins;
 };
