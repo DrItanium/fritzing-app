@@ -24,11 +24,12 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include <QString>
 #include <QDomElement>
 #include <QMultiHash>
+#include <memory>
 
 #include "../viewlayer.h"
 #include "connector.h"
 #include "svgidlayer.h"
-
+#include "ercdata.h"
 class ConnectorShared : public QObject
 {
 	Q_OBJECT
@@ -63,7 +64,7 @@ public:
 	class BusShared * bus();
 	void setBus(class BusShared *);
 	const QString & busID();
-	class ErcData * ercData();
+	ErcData * ercData() noexcept;
 
 protected:
 	void loadPins(const QDomElement & domElement);
@@ -76,7 +77,7 @@ protected:
 	QString m_replacedby;
 	Connector::ConnectorType m_type = Connector::Unknown;
 	QString m_ercType;
-	class ErcData * m_ercData = nullptr;
+    std::unique_ptr<ErcData> m_ercData;
 	class BusShared * m_bus = nullptr;
 
 	QMultiHash<ViewLayer::ViewID, SvgIdLayer*> m_pins;

@@ -37,7 +37,7 @@ ConnectorShared::ConnectorShared( const QDomElement & domElement ) :
 {
 	QDomElement erc = domElement.firstChildElement("erc");
 	if (!erc.isNull()) {
-		m_ercData = new ErcData(erc);
+        m_ercData = std::make_unique<ErcData>(erc);
 	}
 
 	loadPins(domElement);
@@ -59,9 +59,6 @@ ConnectorShared::~ConnectorShared() {
 		delete svgIdLayer;
 	}
 	m_pins.clear();
-	if (m_ercData) {
-		delete m_ercData;
-	}
 }
 
 
@@ -215,12 +212,12 @@ BusShared * ConnectorShared::bus() {
 }
 
 const QString & ConnectorShared::busID() {
-	if (m_bus == NULL) return ___emptyString___;
+	if (!m_bus) return ___emptyString___;
 	return m_bus->id();
 }
 
-ErcData * ConnectorShared::ercData() {
-	return m_ercData;
+ErcData * ConnectorShared::ercData() noexcept {
+	return m_ercData.get();
 }
 
 const QList<SvgIdLayer *> ConnectorShared::svgIdLayers() const
