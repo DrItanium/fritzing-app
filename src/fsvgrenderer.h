@@ -108,7 +108,7 @@ protected:
 
 protected:
 	QString m_filename;
-	QSizeF m_defaultSizeF;
+	QSizeF m_defaultSizeF{0,0};
 	QHash<QString, ConnectorInfo *> m_connectorInfoHash;
 	QHash<QString, ConnectorInfo *> m_nonConnectorInfoHash;
 

@@ -41,7 +41,6 @@ static ConnectorInfo VanillaConnectorInfo;
 
 FSvgRenderer::FSvgRenderer(QObject * parent) : QSvgRenderer(parent)
 {
-	m_defaultSizeF = QSizeF(0,0);
 }
 
 FSvgRenderer::~FSvgRenderer()
