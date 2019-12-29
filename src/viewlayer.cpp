@@ -85,20 +85,12 @@ protected:
 
 //////////////////////////////////////////////
 
-ViewLayer::ViewLayer(ViewLayerID viewLayerID, bool visible, double initialZ)
+ViewLayer::ViewLayer(ViewLayerID viewLayerID, bool visible, double initialZ) :
+    m_visible(visible),
+    m_viewLayerID(viewLayerID),
+    m_initialZ(initialZ),
+    m_initialZFromBelow(initialZ)
 {
-	m_fromBelow = false;
-	m_viewLayerID = viewLayerID;
-	m_visible = visible;
-	m_action = nullptr;
-	m_initialZFromBelow = m_initialZ = initialZ;
-	m_nextZ = 0;
-	m_parentLayer = nullptr;
-	m_active = true;
-	m_includeChildLayers = true;
-}
-
-ViewLayer::~ViewLayer() {
 }
 
 void ViewLayer::initNames() {
