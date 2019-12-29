@@ -91,8 +91,8 @@ class SizeItem : public QObject, public QGraphicsLineItem
 	Q_OBJECT
 
 public:
-	SizeItem();
-	~SizeItem();
+	SizeItem() = default;
+	~SizeItem() = default;
 };
 
 class SketchWidget : public InfoGraphicsView
@@ -656,9 +656,9 @@ protected:
 	QPointer<class ReferenceModel> m_referenceModel;
 	QPointer<SketchModel> m_sketchModel;
 	ViewLayer::ViewID m_viewID;
-	class WaitPushUndoStack * m_undoStack;
-	class SelectItemCommand * m_holdingSelectItemCommand;
-	class SelectItemCommand * m_tempDragWireCommand;
+	class WaitPushUndoStack * m_undoStack = nullptr;
+	class SelectItemCommand * m_holdingSelectItemCommand = nullptr;
+	class SelectItemCommand * m_tempDragWireCommand = nullptr;
 	LayerHash m_viewLayers;
 	QHash<ViewLayer::ViewLayerID, bool> m_viewLayerVisibility;
 	QPointer<Wire> m_connectorDragWire;
@@ -676,7 +676,7 @@ protected:
 	ViewLayer::ViewLayerID m_connectorViewLayerID;
 	ViewLayer::ViewLayerID m_noteViewLayerID;
 	QList<QGraphicsItem *> m_temporaries;
-	bool m_chainDrag;
+	bool m_chainDrag = false;
 	QPointF m_mousePressScenePos;
 	QPointF m_mousePressGlobalPos;
 	QTimer m_autoScrollTimer;
@@ -691,48 +691,48 @@ protected:
 	QPointF m_pasteOffset;
 
 	// Part Menu
-	QMenu *m_itemMenu;
+	QMenu *m_itemMenu = nullptr;
 	QMenu *m_wireMenu;
 
-	bool m_infoViewOnHover;
+	bool m_infoViewOnHover = true;
 
 	QHash<long, ItemBase *> m_savedItems;
 	QHash<Wire *, ConnectorItem *> m_savedWires;
 	QList<ItemBase *> m_additionalSavedItems;
-	int m_ignoreSelectionChangeEvents;
-	bool m_current;
+	int m_ignoreSelectionChangeEvents = 0;
+	bool m_current = false;
 
 	QString m_lastColorSelected;
 
 	ConnectorPairHash m_moveDisconnectedFromFemale;
-	bool m_spaceBarIsPressed;
-	bool m_spaceBarWasPressed;
+	bool m_spaceBarIsPressed = false;
+	bool m_spaceBarWasPressed = false;
 
 	QPointer<ConnectorItem> m_lastHoverEnterConnectorItem;
 	QPointer<ItemBase> m_lastHoverEnterItem;
 	QString m_shortName;
 	QPointer<Wire> m_dragBendpointWire;
-	bool m_dragCurve;
+	bool m_dragCurve = false;
 	QPoint m_dragBendpointPos;
-	StatusConnectStatus m_statusConnectState;
+	StatusConnectStatus m_statusConnectState = StatusConnectNotTried;
 	QList<QGraphicsItem *> m_inFocus;
 	QString m_viewName;
-	bool m_movingByArrow;
-	double m_arrowTotalX;
-	double m_arrowTotalY;
-	bool m_movingByMouse;
-	bool m_alignToGrid;
-	bool m_showGrid;
+	bool m_movingByArrow = false;
+	double m_arrowTotalX = 0.0;
+	double m_arrowTotalY = 0.0;
+	bool m_movingByMouse = false;
+	bool m_alignToGrid = true;
+	bool m_showGrid = true;
 	double m_gridSizeInches;
 	QString m_gridSizeText;
 	QPointer<ItemBase> m_alignmentItem;
 	QPointer<ItemBase> m_originatingItem;
 	QPointF m_alignmentStartPoint;
-	double m_zoom;
-	bool m_draggingBendpoint;
+	double m_zoom = 100;
+	bool m_draggingBendpoint = false;
 	QPointer<SizeItem> m_sizeItem;
 	int m_autoScrollThreshold;
-	bool m_clearSceneRect;
+	bool m_clearSceneRect = false;
 	QPointer<ItemBase> m_moveReferenceItem;
 	QPointer<QSvgRenderer> m_movingSVGRenderer;
 	QPointF m_movingSVGOffset;
@@ -742,23 +742,23 @@ protected:
 	QList< QPointer<ConnectorItem> > m_ratsnestCacheDisconnect;
 	QList< QPointer<ConnectorItem> > m_ratsnestCacheConnect;
 	QList <ItemBase *> m_checkUnder;
-	bool m_addDefaultParts;
+	bool m_addDefaultParts = false;
 	QPointer<ItemBase> m_addedDefaultPart;
-	float m_z;
+	float m_z = 0;
 	QTimer m_arrowTimer;
-	bool m_middleMouseIsPressed;
+	bool m_middleMouseIsPressed = false;
 	QMultiHash<ItemBase *, ConnectorItem *> m_stretchingLegs;
-	bool m_curvyWires;
-	bool m_rubberBandLegWasEnabled;
+	bool m_curvyWires = false;
+	bool m_rubberBandLegWasEnabled = false;
 	RoutingStatus m_routingStatus;
 	bool m_anyInRotation;
-	bool m_pasting;
+	bool m_pasting = false;
 	QPointer<class ResizableBoard> m_resizingBoard;
 	QList< QPointer<ItemBase> > m_squashShapes;
 	QColor m_gridColor;
-	bool m_everZoomed;
-	double m_ratsnestOpacity;
-	double m_ratsnestWidth;
+	bool m_everZoomed = false;
+	double m_ratsnestOpacity = 0.0;
+	double m_ratsnestWidth = 0.0;
 
 public:
 	static ViewLayer::ViewLayerID defaultConnectorLayer(ViewLayer::ViewID viewId);

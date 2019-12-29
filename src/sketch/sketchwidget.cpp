@@ -119,16 +119,6 @@ bool ensureStrokeWidth(QDomDocument & doc, const QString & connectorID, double f
 
 /////////////////////////////////////////////////////////////////////
 
-SizeItem::SizeItem()
-{
-}
-
-SizeItem::~SizeItem()
-{
-}
-
-/////////////////////////////////////////////////////////////////////
-
 enum ConnectionStatus {
 	IN_,
 	OUT_,
@@ -136,7 +126,7 @@ enum ConnectionStatus {
 	UNDETERMINED_
 };
 
-static const double CloseEnough = 0.5;  // in pixels, for swapping into the breadboard
+static constexpr double CloseEnough = 0.5;  // in pixels, for swapping into the breadboard
 
 const int SketchWidget::MoveAutoScrollThreshold = 5;
 const int SketchWidget::DragAutoScrollThreshold = 10;
@@ -154,40 +144,16 @@ bool zLessThan(QGraphicsItem * & p1, QGraphicsItem * & p2)
 /////////////////////////////////////////////////////////////////////
 
 SketchWidget::SketchWidget(ViewLayer::ViewID viewID, QWidget *parent, int size, int minSize)
-	: InfoGraphicsView(parent)
+	: InfoGraphicsView(parent),
+    m_viewID(viewID),
+    m_sizeItem(new SizeItem())
 {
-	m_everZoomed = false;
-	m_itemMenu = NULL;
-	m_pasting = false;
-	m_rubberBandLegWasEnabled = m_curvyWires = false;
-	m_middleMouseIsPressed = false;
 	m_arrowTimer.setParent(this);
 	m_arrowTimer.setInterval(AutoRepeatDelay);
 	m_arrowTimer.setSingleShot(true);
 	m_arrowTimer.setTimerType(Qt::PreciseTimer);
 	m_autoScrollTimer.setTimerType(Qt::PreciseTimer);
 	connect(&m_arrowTimer, SIGNAL(timeout()), this, SLOT(arrowTimerTimeout()));
-	m_addDefaultParts = false;
-	m_addedDefaultPart = NULL;
-	m_movingItem = NULL;
-	m_movingSVGRenderer = NULL;
-	m_clearSceneRect = false;
-	m_draggingBendpoint = false;
-	m_zoom = 100;
-	m_showGrid = m_alignToGrid = true;
-	m_movingByMouse = m_movingByArrow = false;
-	m_statusConnectState = StatusConnectNotTried;
-	m_dragBendpointWire = NULL;
-	m_lastHoverEnterItem = NULL;
-	m_lastHoverEnterConnectorItem = NULL;
-	m_spaceBarWasPressed = m_spaceBarIsPressed = false;
-	m_current = false;
-	m_ignoreSelectionChangeEvents = 0;
-	m_droppingItem = NULL;
-	m_chainDrag = false;
-	m_bendpointWire = m_connectorDragWire = NULL;
-	m_tempDragWireCommand = m_holdingSelectItemCommand = NULL;
-	m_viewID = viewID;
 	//setAlignment(Qt::AlignLeft | Qt::AlignTop);
 	setDragMode(QGraphicsView::RubberBandDrag);
 	setFrameStyle(QFrame::Sunken | QFrame::StyledPanel);
@@ -216,7 +182,6 @@ SketchWidget::SketchWidget(ViewLayer::ViewID viewID, QWidget *parent, int size, 
 	// a bit of a hack so that, when there is no scenerect set,
 	// the first item dropped into the scene doesn't leap to the top left corner
 	// as the scene resizes to fit the new item
-	m_sizeItem = new SizeItem();
 	m_sizeItem->setLine(0, 0, rect().width(), rect().height());
 	//DebugDialog::debug(QString("initial rect %1 %2").arg(rect().width()).arg(rect().height()));
 	this->scene()->addItem(m_sizeItem);
@@ -231,9 +196,7 @@ SketchWidget::SketchWidget(ViewLayer::ViewID viewID, QWidget *parent, int size, 
 	resize(size, size);
 	setMinimumSize(minSize, minSize);
 
-	setLastPaletteItemSelected(NULL);
-
-	m_infoViewOnHover = true;
+	setLastPaletteItemSelected(nullptr);
 
 	setMouseTracking(true);
 
@@ -241,7 +204,7 @@ SketchWidget::SketchWidget(ViewLayer::ViewID viewID, QWidget *parent, int size, 
 
 SketchWidget::~SketchWidget() {
 	foreach (ViewLayer * viewLayer, m_viewLayers.values()) {
-		if (viewLayer == NULL) continue;
+		if (!viewLayer) continue;
 
 		delete viewLayer;
 	}
