@@ -30,7 +30,6 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include <QtDebug>
 #include <QIcon>
 
-DebugDialog* DebugDialog::singleton = NULL;
 QFile DebugDialog::m_file;
 
 #ifdef QT_NO_DEBUG
@@ -61,7 +60,6 @@ DebugDialog::DebugDialog(QWidget *parent)
 	// Let's set the icon
 	this->setWindowIcon(QIcon(QPixmap(":resources/images/fritzing_icon.png")));
 
-	singleton = this;
 	m_debugLevel = DebugDialog::Debug;
 	setWindowTitle(tr("for debugging"));
 	resize(400, 300);
@@ -133,12 +131,7 @@ void DebugDialog::debug(QString message, DebugLevel debugLevel, QObject * ancest
 	if (!m_enabled) return;
 
 
-	if (singleton == NULL) {
-		new DebugDialog();
-		//singleton->show();
-	}
-
-	if (debugLevel < singleton->m_debugLevel) {
+	if (debugLevel < singleton()->m_debugLevel) {
 		return;
 	}
 
@@ -151,58 +144,36 @@ void DebugDialog::debug(QString message, DebugLevel debugLevel, QObject * ancest
 		m_file.close();
 	}
 	DebugEvent* de = new DebugEvent(message, debugLevel, ancestor);
-	QCoreApplication::postEvent(singleton, de);
+	QCoreApplication::postEvent(singleton(), de);
 }
 
 void DebugDialog::hideDebug() {
-	if (singleton) {
-		singleton->hide();
-	}
+	singleton()->hide();
 }
 
 void DebugDialog::showDebug() {
-	if (singleton == NULL) {
-		new DebugDialog();
-	}
-
-	singleton->show();
+	singleton()->show();
 }
 
 void DebugDialog::closeDebug() {
-	if (singleton) {
-		singleton->close();
-	}
+	singleton()->close();
 }
 
 
 bool DebugDialog::visible() {
-	if (singleton == NULL) return false;
-
-	return singleton->isVisible();
+	return singleton()->isVisible();
 }
 
 bool DebugDialog::connectToBroadcast(QObject * receiver, const char* slot) {
-	if (singleton == NULL) {
-		new DebugDialog();
-	}
-
-	return connect(singleton, SIGNAL(debugBroadcast(const QString &, QObject *)), receiver, slot );
+	return connect(singleton(), SIGNAL(debugBroadcast(const QString &, QObject *)), receiver, slot );
 }
 
 void DebugDialog::setDebugLevel(DebugLevel debugLevel) {
-	if (singleton == NULL) {
-		new DebugDialog();
-
-	}
-
-	singleton->m_debugLevel = debugLevel;
+	singleton()->m_debugLevel = debugLevel;
 }
 
 void DebugDialog::cleanup() {
-	if (singleton) {
-		delete singleton;
-		singleton = NULL;
-	}
+	
 }
 
 bool DebugDialog::enabled() {
@@ -211,4 +182,13 @@ bool DebugDialog::enabled() {
 
 void DebugDialog::setEnabled(bool enabled) {
 	m_enabled = enabled;
+}
+
+DebugDialog*
+DebugDialog::singleton() noexcept {
+	static DebugDialog* _singleton = nullptr;
+	if (!_singleton) {
+		_singleton = new DebugDialog();
+	}
+	return _singleton;
 }

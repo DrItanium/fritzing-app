@@ -65,9 +65,11 @@ public:
 protected:
 	bool event ( QEvent * e );
 	void resizeEvent ( QResizeEvent * event );
+protected:
+    static DebugDialog* singleton() noexcept;
 
 protected:
-	static DebugDialog* singleton;
+	//static DebugDialog* singleton;
 	static QFile m_file;
 	static bool m_enabled;
 
