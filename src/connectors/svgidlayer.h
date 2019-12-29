@@ -84,11 +84,11 @@ public:
 	QString m_legId;
 	QString m_legColor;
 	QLineF m_legLine;
-	double m_radius;
-	double m_strokeWidth;
-	double m_legStrokeWidth;
-	bool m_hybrid;
-	bool m_path;
+	double m_radius = 0.0;
+	double m_strokeWidth = 0.0;
+	double m_legStrokeWidth = 0.0;
+	bool m_hybrid = false;
+	bool m_path = false;
 
 protected:
 	PointRect m_pointRectBottom;
