@@ -21,18 +21,7 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include "svgidlayer.h"
 
 SvgIdLayer::SvgIdLayer(ViewLayer::ViewID viewID) : 
-	m_viewID(viewID),
-	m_svgViewLayerID(),
-	m_svgId(),
-	m_terminalId(),
-	m_legId(),
-	m_legColor(),
-	m_legLine(),
-	m_radius(0.0),
-	m_strokeWidth(0.0),
-	m_legStrokeWidth(0.0),
-	m_hybrid(false),
-	m_path(false)
+	m_viewID(viewID)
 { }
 
 SvgIdLayer::SvgIdLayer(const SvgIdLayer& other) : 
