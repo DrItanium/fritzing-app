@@ -65,26 +65,25 @@ void NonConnectorItem::paint( QPainter * painter, const QStyleOptionGraphicsItem
 		.arg(rect().width())
 		);
 	*/
-
+    auto r = rect();
 	if (m_circular) {
 		painter->setBrush(brush());
 		if (m_negativePenWidth < 0) {
 			// for wires
 			painter->setPen(Qt::NoPen);
 			if (!m_negativeOffsetRect) {
-				painter->drawEllipse(rect().center(), m_negativePenWidth, m_negativePenWidth);
+				painter->drawEllipse(r.center(), m_negativePenWidth, m_negativePenWidth);
 			}
 			else {
 				int pw = m_negativePenWidth + 1;
-				painter->drawEllipse(rect().adjusted(-pw, -pw, pw, pw));
+				painter->drawEllipse(r.adjusted(-pw, -pw, pw, pw));
 			}
 		}
 		else
 		{
 			// for parts
-			QRectF r = rect();
-			if (r.width() > 0 && r.height() > 0) {
-				double delta = .66 * m_strokeWidth;
+            if (r.isValid()) {
+				double delta = 0.66 * m_strokeWidth;
 				painter->setPen(pen());
 				painter->drawEllipse(r.adjusted(delta, delta, -delta, -delta));
 			}
@@ -96,8 +95,7 @@ void NonConnectorItem::paint( QPainter * painter, const QStyleOptionGraphicsItem
 		painter->drawPath(m_shape);
 	}
 	else if (m_effectively == EffectivelyCircular) {
-		QRectF r = rect();
-		if (r.width() > 0 && r.height() > 0) {
+        if (r.isValid()) {
 			painter->setBrush(brush());
 			painter->setPen(pen());
 			double delta = r.width() * EffectiveAdjustmentFactor;
@@ -105,8 +103,7 @@ void NonConnectorItem::paint( QPainter * painter, const QStyleOptionGraphicsItem
 		}
 	}
 	else if (m_effectively == EffectivelyRectangular) {
-		QRectF r = rect();
-		if (r.width() > 0 && r.height() > 0) {
+        if (r.isValid()) {
 			painter->setBrush(brush());
 			painter->setPen(pen());
 			double delta = qMin(r.width(), r.height()) * EffectiveAdjustmentFactor;
