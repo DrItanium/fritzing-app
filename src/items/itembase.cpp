@@ -101,47 +101,26 @@ QBrush ItemBase::UnconnectedBrush(StandardUnconnectedColor);
 QBrush ItemBase::ChosenBrush(QColor(255,0,0));
 QBrush ItemBase::EqualPotentialBrush(QColor(255,255,0));
 
-const double ItemBase::NormalConnectorOpacity = 0.4;
-
 static QHash<QString, QStringList> CachedValues;
 
 ///////////////////////////////////////////////////
 
 ItemBase::ItemBase( ModelPart* modelPart, ViewLayer::ViewID viewID, const ViewGeometry & viewGeometry, long id, QMenu * itemMenu )
-	: QGraphicsSvgItem()
+	: QGraphicsSvgItem(),
+    m_id(id),
+    m_viewGeometry(viewGeometry),
+    m_modelPart(modelPart),
+    m_viewID(viewID),
+    m_itemMenu(itemMenu)
 {
-	m_fsvgRenderer = nullptr;
-	m_superpart = nullptr;
-	m_acceptsMousePressLegEvent = true;
-
-	m_squashShape = false;
-
 	//DebugDialog::debug(QString("itembase %1 %2").arg(id).arg((long) static_cast<QGraphicsItem *>(this), 0, 16));
-	m_hasRubberBandLeg = m_moveLock = m_hoverEnterSpaceBarWasPressed = m_spaceBarWasPressed = false;
 
-	m_moveLockItem = nullptr;
-	m_stickyItem = nullptr;
-
-	m_swappable = m_everVisible = true;
-
-	m_rightClickedConnector = nullptr;
-
-	m_partLabel = nullptr;
-	m_itemMenu = itemMenu;
-	m_hoverCount = m_connectorHoverCount = m_connectorHoverCount2 = 0;
-	m_viewID = viewID;
-	m_modelPart = modelPart;
 	if (m_modelPart) {
 		m_modelPart->addViewItem(this);
 	}
-	m_id = id;
-	m_canFlipHorizontal = m_canFlipVertical = m_sticky = m_inRotation = m_inactive = m_layerHidden = m_hidden = false;
-
 	setCursor(*CursorMaster::MoveCursor);
 
-	m_viewGeometry.set(viewGeometry);
 	setAcceptHoverEvents ( true );
-	m_zUninitialized = true;
 }
 
 ItemBase::~ItemBase() {
