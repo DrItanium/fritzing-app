@@ -169,6 +169,9 @@ DRCResultsDialog::DRCResultsDialog(const QString & message, const QStringList & 
 	connect(buttonBox, SIGNAL(accepted()), this, SLOT(close()));
 
 	vLayout->addWidget(buttonBox);
+    QDialogButtonBox * retryButton = new QDialogButtonBox(QDialogButtonBox::Retry);
+    //connect(retryButton, SIGNAL(accepted()), this, SLOT(close()));
+    vLayout->addWidget(retryButton);
 	this->setLayout(vLayout);
 }
 
