@@ -111,12 +111,12 @@ protected:
 
 public:
 	ViewLayer(ViewLayerID, bool visible, double initialZ);
-	~ViewLayer();
+	~ViewLayer() = default;
 
 	void setAction(QAction *);
 	QAction* action();
 	QString & displayName();
-	bool visible();
+	constexpr bool visible() const noexcept { return m_visible; }
 	void setVisible(bool);
 	double nextZ();
 	ViewLayerID viewLayerID();
@@ -127,11 +127,11 @@ public:
 	bool alreadyInLayer(double z);
 	void resetNextZ(double z);
 	void setActive(bool);
-	bool isActive();
-	bool includeChildLayers();
+	constexpr bool isActive() const noexcept { return m_active; }
+	constexpr bool includeChildLayers() const noexcept { return m_includeChildLayers; }
 	void setIncludeChildLayers(bool);
 	void setFromBelow(bool);
-	bool fromBelow();
+	constexpr bool fromBelow() const noexcept { return m_fromBelow; }
 	void setInitialZFromBelow(double);
 	double getZFromBelow(double currentZ, bool fromBelow);
 
@@ -170,15 +170,15 @@ public:
 protected:
 	bool m_visible;
 	ViewLayerID m_viewLayerID;
-	QAction* m_action;
-	double m_nextZ;
+	QAction* m_action = nullptr;
+	double m_nextZ = 0.0;
 	double m_initialZ;
 	double m_initialZFromBelow;
 	QList<ViewLayer *> m_childLayers;
 	ViewLayer * m_parentLayer;
-	bool m_active;
-	bool m_includeChildLayers;
-	bool m_fromBelow;
+	bool m_active = true;
+	bool m_includeChildLayers = true;
+	bool m_fromBelow = false;
 
 	static QHash <ViewID, class NameTriple * > ViewIDNames;
 

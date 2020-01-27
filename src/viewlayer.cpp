@@ -48,10 +48,8 @@ static LayerList PCBViewLayerList;
 static LayerList EmptyLayerList;
 static LayerList PCBViewFromBelowLayerList;
 
-NamePair::NamePair(QString xml, QString display)
+NamePair::NamePair(QString xml, QString display) : xmlName(xml), displayName(display) 
 {
-	xmlName = xml;
-	displayName = display;
 }
 
 //////////////////////////////////////////////
@@ -59,10 +57,11 @@ NamePair::NamePair(QString xml, QString display)
 class NameTriple {
 
 public:
-	NameTriple(const QString & _xmlName, const QString & _viewName, const QString & _naturalName) {
-		m_xmlName = _xmlName;
-		m_viewName = _viewName;
-		m_naturalName = _naturalName;
+	NameTriple(const QString & _xmlName, const QString & _viewName, const QString & _naturalName) :
+        m_xmlName(_xmlName),
+        m_viewName(_viewName),
+        m_naturalName(_naturalName)
+    {
 	}
 
 	QString & xmlName() {
@@ -85,20 +84,12 @@ protected:
 
 //////////////////////////////////////////////
 
-ViewLayer::ViewLayer(ViewLayerID viewLayerID, bool visible, double initialZ)
+ViewLayer::ViewLayer(ViewLayerID viewLayerID, bool visible, double initialZ) :
+    m_visible(visible),
+    m_viewLayerID(viewLayerID),
+    m_initialZ(initialZ),
+    m_initialZFromBelow(initialZ)
 {
-	m_fromBelow = false;
-	m_viewLayerID = viewLayerID;
-	m_visible = visible;
-	m_action = nullptr;
-	m_initialZFromBelow = m_initialZ = initialZ;
-	m_nextZ = 0;
-	m_parentLayer = nullptr;
-	m_active = true;
-	m_includeChildLayers = true;
-}
-
-ViewLayer::~ViewLayer() {
 }
 
 void ViewLayer::initNames() {
@@ -225,10 +216,6 @@ QAction* ViewLayer::action() {
 	return m_action;
 }
 
-bool ViewLayer::visible() {
-	return m_visible;
-}
-
 void ViewLayer::setVisible(bool visible) {
 	m_visible = visible;
 	if (m_action) {
@@ -260,14 +247,14 @@ double ViewLayer::getZIncrement() {
 
 const QString & ViewLayer::viewLayerNameFromID(ViewLayerID viewLayerID) {
 	NamePair * sp = names.value(viewLayerID);
-	if (sp == nullptr) return ___emptyString___;
+	if (!sp) return ___emptyString___;
 
 	return sp->displayName;
 }
 
 const QString & ViewLayer::viewLayerXmlNameFromID(ViewLayerID viewLayerID) {
 	NamePair * sp = names.value(viewLayerID);
-	if (sp == nullptr) return ___emptyString___;
+	if (!sp) return ___emptyString___;
 
 	return sp->xmlName;
 }
@@ -324,9 +311,6 @@ bool ViewLayer::canConnect(ViewLayer::ViewLayerID v1, ViewLayer::ViewLayerID v2)
 	return (!uncs.contains(v2));
 }
 
-bool ViewLayer::isActive() {
-	return m_active;
-}
 
 void ViewLayer::setActive(bool a) {
 	m_active = a;
@@ -442,10 +426,6 @@ bool ViewLayer::isNonCopperLayer(ViewLayer::ViewLayerID viewLayerID) {
 }
 
 
-bool ViewLayer::includeChildLayers() {
-	return m_includeChildLayers;
-}
-
 void ViewLayer::setIncludeChildLayers(bool incl) {
 	m_includeChildLayers = incl;
 }
@@ -543,10 +523,6 @@ bool ViewLayer::getConnectorSvgIDs(QDomElement & element, ViewLayer::ViewID view
 
 	terminalID = p.attribute("terminalId");
 	return true;
-}
-
-bool ViewLayer::fromBelow() {
-	return m_fromBelow;
 }
 
 void ViewLayer::setFromBelow(bool fromBelow) {

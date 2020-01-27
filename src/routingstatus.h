@@ -24,14 +24,17 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include "items/itembase.h"
 
 struct RoutingStatus {
-	int m_netCount;
-	int m_netRoutedCount;
-	int m_connectorsLeftToRoute;
-	int m_jumperItemCount;
+	int m_netCount = 0;
+	int m_netRoutedCount = 0;
+	int m_connectorsLeftToRoute = 0;
+	int m_jumperItemCount = 0;
 
 public:
 	void zero() {
-		m_netCount = m_netRoutedCount = m_connectorsLeftToRoute = m_jumperItemCount = 0;
+        m_netCount = 0;
+        m_netRoutedCount = 0;
+        m_connectorsLeftToRoute = 0;
+        m_jumperItemCount = 0;
 	}
 
 	bool operator!=(const RoutingStatus &other) const {
