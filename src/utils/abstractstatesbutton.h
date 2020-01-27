@@ -30,7 +30,7 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 
 class AbstractStatesButton {
 public:
-	virtual ~AbstractStatesButton() {}			// clears compiler warning
+	virtual ~AbstractStatesButton() = default;
 	void setEnabledIcon() {
 		setImage(m_enabledImage);
 	}
