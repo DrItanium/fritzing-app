@@ -675,7 +675,7 @@ bool FApplication::eventFilter(QObject *obj, QEvent *event)
 			if (!kevent->isAutoRepeat() && (kevent->key() == Qt::Key_Space)) {
 				m_spaceBarIsPressed = true;
 				//DebugDialog::debug("spacebar pressed");
-				CursorMaster::instance()->block();
+				CursorMaster::instance().block();
 				setOverrideCursor(Qt::OpenHandCursor);
 				emit spaceBarIsPressedSignal(true);
 			}
@@ -691,7 +691,7 @@ bool FApplication::eventFilter(QObject *obj, QEvent *event)
 				m_spaceBarIsPressed = false;
 				//DebugDialog::debug("spacebar pressed");
 				restoreOverrideCursor();
-				CursorMaster::instance()->unblock();
+				CursorMaster::instance().unblock();
 				emit spaceBarIsPressedSignal(false);
 			}
 		}

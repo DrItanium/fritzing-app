@@ -104,7 +104,7 @@ void CursorMaster::initCursors()
 			*Cursors.at(i) = new QCursor(bitmap1, bitmap1m, 0, 0);
 		}
 
-		QApplication::instance()->installEventFilter(instance());
+		QApplication::instance()->installEventFilter(&instance());
 	}
 }
 

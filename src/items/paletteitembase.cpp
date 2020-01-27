@@ -539,7 +539,7 @@ void PaletteItemBase::hoverEnterEvent ( QGraphicsSceneHoverEvent * event ) {
 	if (event->isAccepted()) {
 		if (hasRubberBandLeg()) {
 			//DebugDialog::debug("---pab set override cursor");
-			CursorMaster::instance()->addCursor(this, cursor());
+			CursorMaster::instance().addCursor(this, cursor());
 
 			bool connected = false;
 			foreach (ConnectorItem * connectorItem, cachedConnectorItems()) {
@@ -564,7 +564,7 @@ void PaletteItemBase::hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ) {
 		//DebugDialog::debug("------pab restore override cursor");
 	}
 
-	CursorMaster::instance()->removeCursor(this);
+	CursorMaster::instance().removeCursor(this);
 
 	ItemBase::hoverLeaveEvent(event);
 }
@@ -582,7 +582,7 @@ void PaletteItemBase::cursorKeyEvent(Qt::KeyboardModifiers modifiers)
 		else {
 			cursor = *CursorMaster::MoveCursor;
 		}
-		CursorMaster::instance()->addCursor(this, cursor);
+		CursorMaster::instance().addCursor(this, cursor);
 	}
 }
 
@@ -765,10 +765,10 @@ void PaletteItemBase::checkFreeRotation(Qt::KeyboardModifiers modifiers, QPointF
 	bool inCorner = inRotationLocation(scenePos, modifiers, returnPoint);
 
 	if (inCorner) {
-		CursorMaster::instance()->addCursor(this, *CursorMaster::RotateCursor);
+		CursorMaster::instance().addCursor(this, *CursorMaster::RotateCursor);
 	}
 	else {
-		CursorMaster::instance()->addCursor(this, cursor());
+		CursorMaster::instance().addCursor(this, cursor());
 	}
 }
 

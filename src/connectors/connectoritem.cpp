@@ -366,7 +366,7 @@ void ConnectorItem::hoverEnterEvent ( QGraphicsSceneHoverEvent * event ) {
 	}
 
 	//DebugDialog::debug("---CI set override cursor");
-	CursorMaster::instance()->addCursor(this, cursor());
+	CursorMaster::instance().addCursor(this, cursor());
 	bool setDefaultCursor = true;
 	m_hoverEnterSpaceBarWasPressed = false;
 	setHoverColor();
@@ -385,7 +385,7 @@ void ConnectorItem::hoverEnterEvent ( QGraphicsSceneHoverEvent * event ) {
 		m_attachedTo->hoverEnterConnectorItem(event, this);
 	}
 
-	if (setDefaultCursor) CursorMaster::instance()->addCursor(this, *CursorMaster::MakeWireCursor);
+	if (setDefaultCursor) CursorMaster::instance().addCursor(this, *CursorMaster::MakeWireCursor);
 }
 
 void ConnectorItem::hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ) {
@@ -401,14 +401,14 @@ void ConnectorItem::hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ) {
 		infoGraphicsView->hoverLeaveConnectorItem(event, this);
 	}
 
-	CursorMaster::instance()->removeCursor(this);
+	CursorMaster::instance().removeCursor(this);
 
 	if (this->m_attachedTo) {
 		m_attachedTo->hoverLeaveConnectorItem(event, this);
 	}
 
 	//DebugDialog::debug("------CI restore override cursor");
-	CursorMaster::instance()->removeCursor(this);
+	CursorMaster::instance().removeCursor(this);
 }
 
 void ConnectorItem::hoverMoveEvent ( QGraphicsSceneHoverEvent * event ) {
@@ -2778,7 +2778,7 @@ void ConnectorItem::updateWireCursor(Qt::KeyboardModifiers modifiers)
 		}
 	}
 
-	CursorMaster::instance()->addCursor(this, cursor);
+	CursorMaster::instance().addCursor(this, cursor);
 }
 
 void ConnectorItem::updateLegCursor(QPointF p, Qt::KeyboardModifiers modifiers)
@@ -2803,7 +2803,7 @@ void ConnectorItem::updateLegCursor(QPointF p, Qt::KeyboardModifiers modifiers)
 		cursor = Qt::ArrowCursor;
 		break;
 	}
-	CursorMaster::instance()->addCursor(this, cursor);
+	CursorMaster::instance().addCursor(this, cursor);
 }
 
 bool ConnectorItem::curvyWiresIndicated(Qt::KeyboardModifiers modifiers)

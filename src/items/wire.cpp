@@ -863,7 +863,7 @@ void Wire::hoverLeaveConnectorItem(QGraphicsSceneHoverEvent * event, ConnectorIt
 
 void Wire::hoverEnterEvent ( QGraphicsSceneHoverEvent * event ) {
 	ItemBase::hoverEnterEvent(event);
-	CursorMaster::instance()->addCursor(this, cursor());
+	CursorMaster::instance().addCursor(this, cursor());
 	//DebugDialog::debug("---wire set override cursor");
 	updateCursor(event->modifiers());
 }
@@ -871,7 +871,7 @@ void Wire::hoverEnterEvent ( QGraphicsSceneHoverEvent * event ) {
 void Wire::hoverLeaveEvent ( QGraphicsSceneHoverEvent * event ) {
 	ItemBase::hoverLeaveEvent(event);
 	//DebugDialog::debug("------wire restore override cursor");
-	CursorMaster::instance()->removeCursor(this);
+	CursorMaster::instance().removeCursor(this);
 }
 
 
@@ -1913,17 +1913,17 @@ void Wire::updateCursor(Qt::KeyboardModifiers modifiers)
 
 	if (segment) {
 		// dragging a segment of wire between bounded by two other wires
-		CursorMaster::instance()->addCursor(this, *CursorMaster::RubberbandCursor);
+		CursorMaster::instance().addCursor(this, *CursorMaster::RubberbandCursor);
 	}
 	else if (totalConnections == 0) {
 		// only in breadboard view
-		CursorMaster::instance()->addCursor(this, *CursorMaster::MoveCursor);
+		CursorMaster::instance().addCursor(this, *CursorMaster::MoveCursor);
 	}
 	else if (infoGraphicsView && infoGraphicsView->curvyWiresIndicated(modifiers)) {
-		CursorMaster::instance()->addCursor(this, *CursorMaster::MakeCurveCursor);
+		CursorMaster::instance().addCursor(this, *CursorMaster::MakeCurveCursor);
 	}
 	else if (m_displayBendpointCursor) {
-		CursorMaster::instance()->addCursor(this, *CursorMaster::NewBendpointCursor);
+		CursorMaster::instance().addCursor(this, *CursorMaster::NewBendpointCursor);
 	}
 }
 
