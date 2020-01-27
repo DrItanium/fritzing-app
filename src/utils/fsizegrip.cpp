@@ -22,8 +22,7 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include "fsizegrip.h"
 #include "misc.h"
 
-FSizeGrip::FSizeGrip(QMainWindow *parent) : QSizeGrip(parent) {
-	m_mainWindow = parent;
+FSizeGrip::FSizeGrip(QMainWindow *parent) : QSizeGrip(parent), m_mainWindow(parent) {
 	resize(sizeHint());
 	rearrange();
 }

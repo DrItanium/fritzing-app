@@ -26,10 +26,6 @@ FLineEdit::FLineEdit(QWidget * parent) : QLineEdit(parent)
 	connect(this, SIGNAL(editingFinished()), this, SLOT(editingFinishedSlot()));
 }
 
-FLineEdit::~FLineEdit()
-{
-}
-
 void FLineEdit::editingFinishedSlot() {
 	m_readOnly = true;
 	emit editable(false);
