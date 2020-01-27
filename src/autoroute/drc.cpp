@@ -170,7 +170,8 @@ DRCResultsDialog::DRCResultsDialog(const QString & message, const QStringList & 
 
 	vLayout->addWidget(buttonBox);
     QDialogButtonBox * retryButton = new QDialogButtonBox(QDialogButtonBox::Retry);
-    //connect(retryButton, SIGNAL(accepted()), this, SLOT(close()));
+    connect(retryButton, SIGNAL(accepted()), this, SLOT(close()));
+    connect(retryButton, SIGNAL(accepted()), this, SLOT(retryRequestedSlot()));
     vLayout->addWidget(retryButton);
 	this->setLayout(vLayout);
 }
@@ -213,6 +214,11 @@ void DRCResultsDialog::releasedSlot(QListWidgetItem * item) {
 	}
 	QPixmap pixmap = QPixmap::fromImage(*m_displayImage);
 	m_displayItem->setPixmap(pixmap);
+}
+
+void DRCResultsDialog::retryRequestedSlot() {
+    m_redoRequested = true;
+    DebugDialog::debug("retryRequestedSlot called!");
 }
 
 ///////////////////////////////////////////
@@ -263,6 +269,9 @@ QStringList DRC::start(bool showOkMessage, double keepoutMils) {
 	QString message;
 	QStringList messages;
 	QList<CollidingThing *> collidingThings;
+redo:
+    message.clear();
+    messages.clear();
 
 	bool result = startAux(message, messages, collidingThings, keepoutMils);
 	if (result) {
@@ -291,6 +300,13 @@ QStringList DRC::start(bool showOkMessage, double keepoutMils) {
 		else {
 			DRCResultsDialog * dialog = new DRCResultsDialog(message, messages, collidingThings, m_displayItem, m_displayImage, m_sketchWidget, m_sketchWidget->window());
 			dialog->show();
+            if (dialog->retryRequested()) {
+                // ugh a test
+                DebugDialog::debug("retry was requested, doing the ... goto");
+                goto redo;
+            } else {
+                DebugDialog::debug("retry was not requested");
+            }
 		}
 	}
 	else {}

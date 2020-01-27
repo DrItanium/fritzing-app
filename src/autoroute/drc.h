@@ -120,9 +120,12 @@ public:
 	DRCResultsDialog(const QString & message, const QStringList & messages, const QList<CollidingThing *> &, QGraphicsPixmapItem * displayItem,  QImage * displayImage, class PCBSketchWidget * sketchWidget, QWidget *parent = nullptr);
 	~DRCResultsDialog();
 
+    constexpr bool retryRequested() const noexcept { return m_redoRequested; }
+
 protected slots:
 	void pressedSlot(QListWidgetItem *);
 	void releasedSlot(QListWidgetItem *);
+    void retryRequestedSlot();
 
 protected:
 	QStringList m_messages;
@@ -130,6 +133,7 @@ protected:
 	QPointer <class PCBSketchWidget> m_sketchWidget;
 	QGraphicsPixmapItem * m_displayItem = nullptr;
 	QImage * m_displayImage = nullptr;
+    bool m_redoRequested = false;
 };
 
 #endif
