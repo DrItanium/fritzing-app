@@ -1842,7 +1842,7 @@ bool SketchWidget::dragEnterEventAux(QDragEnterEvent *event) {
 
 		ItemDrag::cache().insert(this, m_droppingItem);
 		//m_droppingItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
-		connect(ItemDrag::singleton(), SIGNAL(dragIsDoneSignal(ItemDrag *)), this, SLOT(dragIsDoneSlot(ItemDrag *)));
+		connect(&ItemDrag::singleton(), SIGNAL(dragIsDoneSignal(ItemDrag *)), this, SLOT(dragIsDoneSlot(ItemDrag *)));
 	}
 	//ItemDrag::_setPixmapVisible(false);
 
@@ -5417,7 +5417,6 @@ void SketchWidget::dragIsDoneSlot(ItemDrag * itemDrag) {
 	disconnect(itemDrag, SIGNAL(dragIsDoneSignal(ItemDrag *)), this, SLOT(dragIsDoneSlot(ItemDrag *)));
 	killDroppingItem();					// drag is done, but nothing dropped here: remove the temporary item
 }
-
 
 void SketchWidget::clearTemporaries() {
 	for (int i = 0; i < m_temporaries.count(); i++) {

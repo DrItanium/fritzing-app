@@ -22,31 +22,29 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include <QApplication>
 #include <QEventLoop>
 
-ProcessEventBlocker * ProcessEventBlocker::m_singleton = new ProcessEventBlocker();
-
-ProcessEventBlocker::ProcessEventBlocker()
-{
-	m_count = 0;
+ProcessEventBlocker& ProcessEventBlocker::singleton() noexcept {
+    static ProcessEventBlocker _singleton;
+    return _singleton;
 }
 
 void ProcessEventBlocker::processEvents() {
-	m_singleton->_processEvents();
+	singleton()._processEvents();
 }
 
 void ProcessEventBlocker::processEvents(int maxTime) {
-	m_singleton->_processEvents(maxTime);
+	singleton()._processEvents(maxTime);
 }
 
 bool ProcessEventBlocker::isProcessing() {
-	return m_singleton->_isProcessing();
+	return singleton()._isProcessing();
 }
 
 void ProcessEventBlocker::block() {
-	return m_singleton->_inc(1);
+	return singleton()._inc(1);
 }
 
 void ProcessEventBlocker::unblock() {
-	return m_singleton->_inc(-1);
+	return singleton()._inc(-1);
 }
 
 void ProcessEventBlocker::_processEvents() {

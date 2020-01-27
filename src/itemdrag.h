@@ -35,11 +35,11 @@ class ItemDrag : public QObject {
 
 
 protected:
-	ItemDrag(QObject * parent = 0);
+	ItemDrag(QObject * parent = nullptr) : QObject(parent) { }
 	void __dragIsDone();
 
 public:
-	static ItemDrag * singleton();
+	static ItemDrag& singleton() noexcept;
 	static QHash<QObject *, QObject *> & cache();
 	static void dragIsDone();
 	static void cleanup();
@@ -54,10 +54,7 @@ signals:
 protected:
 	QHash<QObject *, QObject *> m_cache;
 	QPointer<QWidget> m_originator;
-	bool m_originatorIsTempBin;
-
-protected:
-	static ItemDrag * Singleton;
+	bool m_originatorIsTempBin = false;
 };
 
 #endif

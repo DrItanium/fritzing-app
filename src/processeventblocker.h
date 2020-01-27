@@ -28,12 +28,12 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 class ProcessEventBlocker {
 
 protected:
-	ProcessEventBlocker();
-	~ProcessEventBlocker();
+	ProcessEventBlocker() = default;
 	bool _isProcessing();
 	void _processEvents();
 	void _processEvents(int maxTime);
 	void _inc(int i);
+    static ProcessEventBlocker& singleton() noexcept; 
 
 public:
 	static void processEvents();
@@ -43,11 +43,9 @@ public:
 	static void unblock();
 
 protected:
-	int m_count;
+	int m_count = 0;
 	QMutex m_mutex;
 
-protected:
-	static ProcessEventBlocker * m_singleton;
 };
 
 #endif /* PROCESSEVENTBLOCKER_H_ */

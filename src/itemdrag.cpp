@@ -22,51 +22,38 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include "itemdrag.h"
 #include "debugdialog.h"
 
-ItemDrag * ItemDrag::Singleton = new ItemDrag();
-
-ItemDrag::ItemDrag(QObject * parent) :
-	QObject(parent)
-{
-	m_originator = NULL;
-	m_originatorIsTempBin = false;
-}
-
 void ItemDrag::__dragIsDone() {
 	m_cache.clear();
 	emit dragIsDoneSignal(this);
 }
 
-void ItemDrag::cleanup() {
-	if (Singleton) {
-		delete Singleton;
-		Singleton = NULL;
-	}
-}
+void ItemDrag::cleanup() { }
 
 QHash<QObject *, QObject *> & ItemDrag::cache() {
-	return Singleton->m_cache;
+	return singleton().m_cache;
 }
 
-ItemDrag * ItemDrag::singleton() {
-	return Singleton;
+ItemDrag& ItemDrag::singleton() noexcept {
+    static ItemDrag _singleton;
+	return _singleton;
 }
 
 void ItemDrag::dragIsDone() {
-	Singleton->__dragIsDone();
+	singleton().__dragIsDone();
 }
 
 void ItemDrag::setOriginator(QWidget * originator) {
-	Singleton->m_originator = originator;
+	singleton().m_originator = originator;
 }
 
 QWidget* ItemDrag::originator() {
-	return Singleton->m_originator;
+	return singleton().m_originator;
 }
 
 void ItemDrag::setOriginatorIsTempBin(bool itb) {
-	Singleton->m_originatorIsTempBin = itb;
+    singleton().m_originatorIsTempBin = itb;
 }
 
 bool ItemDrag::originatorIsTempBin() {
-	return Singleton->m_originatorIsTempBin;
+    return singleton().m_originatorIsTempBin;
 }
