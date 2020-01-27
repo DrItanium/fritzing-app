@@ -23,17 +23,6 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 
 // all measurements in millimeters
 
-const double SchematicRectConstants::PinWidth = 0.246944;  // millimeters
-const double SchematicRectConstants::PinSmallTextHeight = 0.881944444;
-const double SchematicRectConstants::PinBigTextHeight = 1.23472222;
-const double SchematicRectConstants::PinTextIndent = PinWidth * 2;   // was PinWidth * 3;
-const double SchematicRectConstants::PinTextVert = PinWidth * 1;
-const double SchematicRectConstants::PinSmallTextVert = -PinWidth / 2;
-const double SchematicRectConstants::LabelTextHeight = 1.49930556;
-const double SchematicRectConstants::LabelTextSpace = 0.1;
-const double SchematicRectConstants::RectStrokeWidth = 0.3175;
-const double SchematicRectConstants::NewUnit = 0.1 * 25.4;      // .1in in mm
-
 const QString SchematicRectConstants::PinColor("#787878");
 const QString SchematicRectConstants::PinTextColor("#8c8c8c");
 const QString SchematicRectConstants::TitleColor("#000000");
@@ -194,16 +183,16 @@ QString SchematicRectConstants::genSchematicDIP(QList<QDomElement> & powers, QLi
 	//qDebug() << "sch bus" << contact.attribute("signal") << contact.attribute("name") << contact.attribute("connectorIndex");
 	//}
 
-	qreal bigFontSize = 1000 * SchematicRectConstants::PinBigTextHeight / 25.4;
-	qreal bigPinFontSize = 1000 * SchematicRectConstants::PinBigTextHeight / 25.4;
-	qreal smallPinFontSize = 1000 * SchematicRectConstants::PinSmallTextHeight / 25.4;
-	qreal pinThickness = 1000 * SchematicRectConstants::PinWidth / 25.4;
-	qreal halfPinThickness = pinThickness / 2;
-	qreal unitLength = 1000 * SchematicRectConstants::NewUnit / 25.4;
-	qreal pinLength = 2 * unitLength;
-	qreal pinTextIndent = 1000 * SchematicRectConstants::PinTextIndent / 25.4;
-	qreal pinTextVert = 1000 * SchematicRectConstants::PinTextVert / 25.4;
-	qreal rectThickness = 1000 * SchematicRectConstants::RectStrokeWidth / 25.4;
+	constexpr qreal bigFontSize = 1000 * SchematicRectConstants::PinBigTextHeight / 25.4;
+	constexpr qreal bigPinFontSize = 1000 * SchematicRectConstants::PinBigTextHeight / 25.4;
+	constexpr qreal smallPinFontSize = 1000 * SchematicRectConstants::PinSmallTextHeight / 25.4;
+	constexpr qreal pinThickness = 1000 * SchematicRectConstants::PinWidth / 25.4;
+	constexpr qreal halfPinThickness = pinThickness / 2;
+	constexpr qreal unitLength = 1000 * SchematicRectConstants::NewUnit / 25.4;
+	constexpr qreal pinLength = 2 * unitLength;
+	constexpr qreal pinTextIndent = 1000 * SchematicRectConstants::PinTextIndent / 25.4;
+	constexpr qreal pinTextVert = 1000 * SchematicRectConstants::PinTextVert / 25.4;
+	constexpr qreal rectThickness = 1000 * SchematicRectConstants::RectStrokeWidth / 25.4;
 
 	QStringList titles;
 	if (genericSMD) {

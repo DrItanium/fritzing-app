@@ -30,23 +30,22 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 class SchematicRectConstants {
 
 public:
-	static const double PinWidth;
-	static const double PinSmallTextHeight;
-	static const double PinBigTextHeight;
-	static const double PinTextIndent;
-	static const double PinTextVert;
-	static const double PinSmallTextVert;
-	static const double LabelTextHeight;
-	static const double LabelTextSpace;
-	static const double RectStrokeWidth;
+    static constexpr double PinWidth = 0.246944;  // millimeters
+    static constexpr double PinSmallTextHeight = 0.881944444;
+    static constexpr double PinBigTextHeight = 1.23472222;
+    static constexpr double PinTextIndent = PinWidth * 2;   // was PinWidth * 3;
+    static constexpr double PinTextVert = PinWidth * 1;
+    static constexpr double PinSmallTextVert = -PinWidth / 2;
+    static constexpr double LabelTextHeight = 1.49930556;
+    static constexpr double LabelTextSpace = 0.1;
+    static constexpr double RectStrokeWidth = 0.3175;
+    static constexpr double NewUnit = 0.1 * 25.4;      // .1in in mm
 
 	static const QString PinColor;
 	static const QString PinTextColor;
 	static const QString TitleColor;
 	static const QString RectStrokeColor;
 	static const QString RectFillColor;
-
-	static const double NewUnit;
 
 	static const QString FontFamily;
 
