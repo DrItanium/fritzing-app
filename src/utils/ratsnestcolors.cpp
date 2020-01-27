@@ -88,10 +88,9 @@ bool RatsnestColor::matchColor(const QString & string) {
 //////////////////////////////////////////////////////
 
 RatsnestColors::RatsnestColors(const QDomElement & view)
+    : m_viewID(ViewLayer::idFromXmlName(view.attribute("name")))
 {
-	m_viewID = ViewLayer::idFromXmlName(view.attribute("name"));
 	m_backgroundColor.setNamedColor(view.attribute("background"));
-	m_index = 0;
 	QDomElement color = view.firstChildElement("color");
 	while (!color.isNull()) {
 		RatsnestColor * ratsnestColor = new RatsnestColor(color);

@@ -27,6 +27,7 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include <QStringList>
 #include "../viewlayer.h"
 
+class RatsnestColor;
 class RatsnestColors {
 
 public:
@@ -49,12 +50,12 @@ protected:
 protected:
 	ViewLayer::ViewID m_viewID;
 	QColor m_backgroundColor;
-	int m_index;
-	QHash<QString, class RatsnestColor *> m_ratsnestColorHash;
-	QList<class RatsnestColor *> m_ratsnestColorList;
+	int m_index = 0;
+	QHash<QString, RatsnestColor *> m_ratsnestColorHash;
+	QList<RatsnestColor *> m_ratsnestColorList;
 
 	static QHash<ViewLayer::ViewID, RatsnestColors *> m_viewList;
-	static QHash<QString, class RatsnestColor *> m_allNames;
+	static QHash<QString, RatsnestColor *> m_allNames;
 };
 
 
