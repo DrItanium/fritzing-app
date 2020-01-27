@@ -126,17 +126,17 @@ void allGs(QDomElement & element) {
 
 DRCResultsDialog::DRCResultsDialog(const QString & message, const QStringList & messages, const QList<CollidingThing *> & collidingThings,
 								   QGraphicsPixmapItem * displayItem, QImage * displayImage, PCBSketchWidget * sketchWidget, QWidget *parent)
-	: QDialog(parent)
+	: QDialog(parent),
+    m_messages(messages),
+    m_collidingThings(collidingThings),
+    m_sketchWidget(sketchWidget),
+    m_displayItem(displayItem),
+    m_displayImage(displayImage)
 {
 	setAttribute(Qt::WA_DeleteOnClose, true);
-	m_messages = messages;
-	m_sketchWidget = sketchWidget;
-	m_displayItem = displayItem;
 	if (m_displayItem) {
 		m_displayItem->setFlags(0);
 	}
-	m_displayImage = displayImage;
-	m_collidingThings = collidingThings;
 
 	this->setWindowTitle(tr("DRC Results"));
 

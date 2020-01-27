@@ -100,16 +100,16 @@ protected:
 	static void splitSubs(QDomDocument *, QDomElement & root, const QString & partID, const Markers &, const QStringList & svgIDs,  const QStringList & terminalIDs, const QList<ItemBase *> &, QHash<QString, QString> & both, bool checkIntersection);
 
 protected:
-	PCBSketchWidget * m_sketchWidget;
-	ItemBase * m_board;
-	double m_keepout;
-	QImage * m_plusImage;
-	QImage * m_minusImage;
-	QImage * m_displayImage;
-	QGraphicsPixmapItem * m_displayItem;
+	PCBSketchWidget * m_sketchWidget = nullptr;
+	ItemBase * m_board = nullptr;
+	double m_keepout = 0.0;
+	QImage * m_plusImage = nullptr;
+	QImage * m_minusImage = nullptr;
+	QImage * m_displayImage = nullptr;
+	QGraphicsPixmapItem * m_displayItem = nullptr;
 	QHash<ViewLayer::ViewLayerPlacement, QDomDocument *> m_masterDocs;
-	bool m_cancelled;
-	int m_maxProgress;
+	bool m_cancelled = false;
+	int m_maxProgress = 0;
 };
 
 class DRCResultsDialog : public QDialog
@@ -117,7 +117,7 @@ class DRCResultsDialog : public QDialog
 	Q_OBJECT
 
 public:
-	DRCResultsDialog(const QString & message, const QStringList & messages, const QList<CollidingThing *> &, QGraphicsPixmapItem * displayItem,  QImage * displayImage, class PCBSketchWidget * sketchWidget, QWidget *parent = 0);
+	DRCResultsDialog(const QString & message, const QStringList & messages, const QList<CollidingThing *> &, QGraphicsPixmapItem * displayItem,  QImage * displayImage, class PCBSketchWidget * sketchWidget, QWidget *parent = nullptr);
 	~DRCResultsDialog();
 
 protected slots:
@@ -128,8 +128,8 @@ protected:
 	QStringList m_messages;
 	QList<CollidingThing *> m_collidingThings;
 	QPointer <class PCBSketchWidget> m_sketchWidget;
-	QGraphicsPixmapItem * m_displayItem;
-	QImage * m_displayImage;
+	QGraphicsPixmapItem * m_displayItem = nullptr;
+	QImage * m_displayImage = nullptr;
 };
 
 #endif
