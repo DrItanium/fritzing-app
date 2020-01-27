@@ -27,14 +27,7 @@ constexpr auto Steps = 7;
 constexpr auto Wait = 100;
 
 AutoCloseMessageBox::AutoCloseMessageBox( QWidget * parent )
-	: QLabel(parent),
-	m_movingState(MovingState::MovingOut),
-	m_endX(0),
-	m_endY(0),
-	m_startX(0),
-	m_startY(0),
-	m_animationTimer(),
-	m_counter(0) 
+	: QLabel(parent)
 {
 	setWordWrap(true);
 }
@@ -138,10 +131,10 @@ void AutoCloseMessageBox::prepMoveBack() {
 void AutoCloseMessageBox::showMessage(QWidget *window, const QString &message)
 {
 	MainWindow * mainWindow = qobject_cast<MainWindow *>(window);
-	if (mainWindow == NULL) return;
+	if (!mainWindow) return;
 
 	QStatusBar * statusBar = mainWindow->realStatusBar();
-	if (statusBar == NULL) return;
+	if (!statusBar) return;
 
 	AutoCloseMessageBox * acmb = new AutoCloseMessageBox(mainWindow);
 	acmb->setText(message);
