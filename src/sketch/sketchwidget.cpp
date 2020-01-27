@@ -4430,7 +4430,7 @@ void SketchWidget::sortAnyByZ(const QList<QGraphicsItem *> & items, QList<ItemBa
 	}
 
 	// order by z
-	qSort(bases.begin(), bases.end(), ItemBase::zLessThan);
+	std::sort(bases.begin(), bases.end(), ItemBase::zLessThan);
 }
 
 bool SketchWidget::lessThan(int a, int b) {
@@ -7248,7 +7248,7 @@ QString SketchWidget::renderToSVG(RenderThing & renderThing, QList<QGraphicsItem
 	QHash<QString, QString> svgHash;
 
 	// put them in z order
-	qSort(itemsAndLabels.begin(), itemsAndLabels.end(), zLessThan);
+	std::sort(itemsAndLabels.begin(), itemsAndLabels.end(), zLessThan);
 
 	QList<ItemBase *> gotLabel;
 	foreach (QGraphicsItem * item, itemsAndLabels) {
@@ -8374,7 +8374,7 @@ void SketchWidget::copyDrop() {
 		itemBases.append(itemBase);
 	}
 
-	qSort(itemBases.begin(), itemBases.end(), ItemBase::zLessThan);
+	std::sort(itemBases.begin(), itemBases.end(), ItemBase::zLessThan);
 	foreach (ItemBase * itemBase, itemBases) {
 		QPointF loc = itemBase->getViewGeometry().loc();
 		itemBase->setItemPos(loc);

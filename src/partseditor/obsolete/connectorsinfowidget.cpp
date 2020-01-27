@@ -308,7 +308,7 @@ QVBoxLayout *ConnectorsInfoWidget::scrollContentLayout() {
 }
 
 void ConnectorsInfoWidget::connectorsFound(QList< QPointer<Connector> > conns) {
-	qSort(conns);
+	std::sort(conns);
 
 	QProgressDialog progress(tr("Loading connectors..."), 0, 0, conns.size(), this);
 	progress.show();

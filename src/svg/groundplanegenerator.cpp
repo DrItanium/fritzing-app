@@ -621,7 +621,8 @@ void GroundPlaneGenerator::splitScanLines(QList<QRect> & rects, QList< QList<int
 	}
 
 	foreach (QList<int> * piece, pieces) {
-		qSort(*piece);
+        auto& targetPiece = *piece;
+		std::sort(targetPiece.begin(), targetPiece.end());
 	}
 }
 

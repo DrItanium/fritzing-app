@@ -73,12 +73,12 @@ FixFontsDialog::FixFontsDialog(QWidget *parent, const QSet<QString> fontsTofix)
 		m_fontsToFix.remove(fontFileName);
 	}
 	QStringList availFonts = InstalledFonts::InstalledFontsList.toList();
-	qSort(availFonts);
+	std::sort(availFonts);
 	availFonts.insert(0,tr("-- ignore --"));
 	int defaultIdx = availFonts.indexOf("Droid Sans");
 
 	QStringList fontsToFixList = m_fontsToFix.toList();
-	qSort(fontsToFixList);
+	std::sort(fontsToFixList);
 	foreach(QString ftf, fontsToFixList) {
 		DebugDialog::debug("font not found: "+ftf);
 		createLine(layout,ftf,availFonts,defaultIdx);

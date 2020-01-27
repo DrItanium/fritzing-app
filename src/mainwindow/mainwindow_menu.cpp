@@ -670,7 +670,7 @@ void MainWindow::populateMenuFromXMLFile(QMenu *parentMenu, QStringList &actions
 
 	QHash<QString, struct SketchDescriptor *> index = indexAvailableElements(indexDomElem, folderPath, actionsTracker, localeName);
 	QList<SketchDescriptor *> sketchDescriptors(index.values());
-	qSort(sketchDescriptors.begin(), sketchDescriptors.end(), sortSketchDescriptors);
+	std::sort(sketchDescriptors.begin(), sketchDescriptors.end(), sortSketchDescriptors);
 
 	if (sketchDescriptors.size() > 0) {
 		// set up the "all" category
@@ -1647,7 +1647,7 @@ void MainWindow::updateLayerMenu(bool resetLayout) {
 	LayerList keys = viewLayers.keys();
 
 	// make sure they're in ascending order when inserting into the menu
-	qSort(keys.begin(), keys.end());
+	std::sort(keys.begin(), keys.end());
 
 	foreach (ViewLayer::ViewLayerID key, keys) {
 		ViewLayer * viewLayer = viewLayers.value(key);

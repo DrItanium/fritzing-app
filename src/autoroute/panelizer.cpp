@@ -1195,7 +1195,7 @@ void Panelizer::addOptional(int optionalCount, QList<PanelItem *> & refPanelItem
 	if (optionalCount == 0) return;
 
 	QList<PanelItem *> copies(refPanelItems);
-	qSort(copies.begin(), copies.end(), byOptionalPriority);
+	std::sort(copies.begin(), copies.end(), byOptionalPriority);
 	while (optionalCount > 0) {
 		int pool = 0;
 		int priority = -1;
@@ -1802,7 +1802,7 @@ int Panelizer::bestFitLoop(QList<PanelItem *> & refPanelItems, PanelParams & pan
 
 		planePairs << makePlanePair(panelParams, true);
 
-		qSort(insertPanelItems.begin(), insertPanelItems.end(), areaGreaterThan);
+		std::sort(insertPanelItems.begin(), insertPanelItems.end(), areaGreaterThan);
 		bestFit(insertPanelItems, panelParams, planePairs, customPartsOnly);
 
 		shrinkLastPanel(planePairs, insertPanelItems, panelParams, customPartsOnly);
