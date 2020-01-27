@@ -52,15 +52,10 @@ ZoomLabel::ZoomLabel(QWidget * parent) : QLabel(parent)
 		AutoRepeatInterval = button.autoRepeatInterval();
 		AutoRepeatDelay = button.autoRepeatDelay();
 	}
-	m_autoRepeat = m_mouseIsDown = m_mouseIsIn = m_repeated = false;
 	m_timer.setSingleShot(false);
 	m_timer.setInterval(AutoRepeatInterval);
 	m_timer.setTimerType(Qt::PreciseTimer);
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(repeat()));
-}
-
-ZoomLabel::~ZoomLabel()
-{
 }
 
 void ZoomLabel::setAutoRepeat(bool autoRepeat)

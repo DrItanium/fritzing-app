@@ -35,7 +35,7 @@ class ZoomLabel : public QLabel {
 
 public:
 	ZoomLabel(QWidget * parent);
-	~ZoomLabel();
+	~ZoomLabel() = default;
 
 	void setImages(const QString & normal, const QString & pressed);
 	void setAutoRepeat(bool);
@@ -54,17 +54,17 @@ protected:
 	QTimer m_timer;
 	QPixmap m_pressed;
 	QPixmap m_normal;
-	bool m_autoRepeat;
-	bool m_mouseIsDown;
-	bool m_mouseIsIn;
-	bool m_repeated;
+	bool m_autoRepeat = false;
+	bool m_mouseIsDown = false;
+	bool m_mouseIsIn = false;
+	bool m_repeated = false;
 };
 
 class ZoomSlider: public QFrame {
 	Q_OBJECT
 
 public:
-	ZoomSlider(int maxValue, QWidget * parent=0);
+	ZoomSlider(int maxValue, QWidget * parent = nullptr);
 
 	void setValue(double);
 	double value();
@@ -94,12 +94,12 @@ protected:
 	//bool m_userStillWriting;
 	//QString m_valueBackup;
 	//int m_indexBackup;
-	QSlider * m_slider;
-	QLineEdit * m_lineEdit;
-	ZoomLabel * m_plusButton;
-	ZoomLabel * m_minusButton;
-	QLabel * m_suffix;
-	bool m_firstTime;
+	QSlider * m_slider = nullptr;
+	QLineEdit * m_lineEdit = nullptr;
+	ZoomLabel * m_plusButton = nullptr;
+	ZoomLabel * m_minusButton = nullptr;
+	QLabel * m_suffix = nullptr;
+	bool m_firstTime = true;
 
 public:
 	static double ZoomStep;
