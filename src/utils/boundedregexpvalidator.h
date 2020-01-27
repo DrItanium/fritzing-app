@@ -24,17 +24,12 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include <QRegExpValidator>
 #include <limits>
 
-typedef double (*Converter)(const QString &, const QString & symbol);
+using Converter = double(*)(const QString&, const QString& symbol);
 
 class BoundedRegExpValidator : public QRegExpValidator
 {
 public:
-	BoundedRegExpValidator(QObject * parent) : QRegExpValidator(parent) {
-		m_max = std::numeric_limits<double>::max();
-		m_min = std::numeric_limits<double>::min();
-		m_converter = NULL;
-		m_symbol = "";
-	}
+	BoundedRegExpValidator(QObject * parent) : QRegExpValidator(parent) { }
 
 	void setBounds(double min, double max) {
 		m_min = min;
@@ -53,7 +48,7 @@ public:
 		QValidator::State state = QRegExpValidator::validate(input, pos);
 		if (state == QValidator::Invalid) return state;
 		if (state == QValidator::Intermediate) return state;
-		if (m_converter == NULL) return state;
+		if (!m_converter) return state;
 
 		double converted = m_converter(input, m_symbol);
 		if (converted < m_min) return QValidator::Invalid;
@@ -63,10 +58,10 @@ public:
 	}
 
 protected:
-	double m_min;
-	double m_max;
+	double m_min = std::numeric_limits<double>::max();
+	double m_max = std::numeric_limits<double>::min();
 	QString m_symbol;
-	Converter m_converter;
+	Converter m_converter = nullptr;
 };
 
 #endif
