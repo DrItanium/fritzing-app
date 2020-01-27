@@ -34,10 +34,10 @@ class CursorMaster : public QObject {
 	Q_OBJECT
 
 protected:
-	CursorMaster();
+	CursorMaster() = default;
 
 public:
-	static CursorMaster * instance();
+	static CursorMaster& instance();
 	static void initCursors();
 
 	void addCursor(QObject * listener, const QCursor & cursor);
@@ -67,8 +67,7 @@ public:
 	static QCursor * ScaleCursor;
 
 protected:
-	static CursorMaster TheCursorMaster;
-	bool m_blocked;
+	bool m_blocked = false;
 };
 
 #endif
