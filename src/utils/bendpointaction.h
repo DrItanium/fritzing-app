@@ -25,22 +25,24 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include <QPointF>
 #include <QString>
 
+class ConnectorItem;
+class ItemBase;
 class BendpointAction : public QAction
 {
 	Q_OBJECT
 public:
 	BendpointAction(const QString & text, QObject * parent);
 
-	void setLastHoverEnterConnectorItem(class ConnectorItem *);
-	void setLastHoverEnterItem(class ItemBase *);
+	void setLastHoverEnterConnectorItem(ConnectorItem *);
+	void setLastHoverEnterItem(ItemBase *);
 	void setLastLocation(QPointF);
-	class ConnectorItem * lastHoverEnterConnectorItem();
-	class ItemBase * lastHoverEnterItem();
-	QPointF lastLocation();
+	ConnectorItem * lastHoverEnterConnectorItem();
+	ItemBase * lastHoverEnterItem();
+	constexpr const QPointF& lastLocation() const noexcept { return m_lastLocation; }
 
 protected:
-	class ConnectorItem * m_lastHoverEnterConnectorItem;
-	class ItemBase * m_lastHoverEnterItem;
+	ConnectorItem * m_lastHoverEnterConnectorItem = nullptr;
+	ItemBase * m_lastHoverEnterItem = nullptr;
 	QPointF m_lastLocation;
 
 };
