@@ -33,9 +33,6 @@ ResizeHandle::ResizeHandle(const QPixmap &pixmap, const QCursor & cursor, bool i
 	setFlag(QGraphicsItem::ItemIgnoresTransformations, ignoresTransforms);
 }
 
-ResizeHandle::~ResizeHandle() {
-}
-
 void ResizeHandle::mousePressEvent(QGraphicsSceneMouseEvent * event) {
 	event->accept();
 	emit mousePressSignal(event, this);
@@ -53,11 +50,6 @@ void ResizeHandle::mouseReleaseEvent(QGraphicsSceneMouseEvent * event) {
 
 void ResizeHandle::setResizeOffset(QPointF p) {
 	m_resizeOffset = p;
-}
-
-QPointF ResizeHandle::resizeOffset()
-{
-	return m_resizeOffset;
 }
 
 QVariant ResizeHandle::itemChange(GraphicsItemChange change, const QVariant &value)

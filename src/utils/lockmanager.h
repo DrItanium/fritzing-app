@@ -38,7 +38,7 @@ class LockManager : public QObject {
 	Q_OBJECT
 
 public:
-	LockManager();
+	LockManager() = default;
 	~LockManager();
 
 public:
@@ -49,8 +49,8 @@ public:
 
 public:
 	static const QString LockedFileName;
-	static const long FastTime;
-	static const long SlowTime;
+	static constexpr long FastTime = 2000;
+	static constexpr long SlowTime = 240000;
 
 public slots:
 	void touchFiles();

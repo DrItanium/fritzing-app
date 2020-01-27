@@ -29,8 +29,6 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include <QDateTime>
 
 const QString LockManager::LockedFileName = "___lockfile___.txt";
-const long LockManager::FastTime =  2000;
-const long LockManager::SlowTime = 240000;
 
 static LockManager TheLockManager;
 static QHash<long, QPointer<QTimer> > TheTimers;
@@ -54,10 +52,6 @@ bool LockedFile::touch() {
 
 /////////////////////////////////////////////////
 
-LockManager::LockManager() : QObject()
-{
-}
-
 LockManager::~LockManager()
 {
 	foreach (QTimer * timer, TheTimers) {
@@ -78,7 +72,7 @@ void LockManager::cleanup() {
 
 void LockManager::touchFiles() {
 	QTimer * timer = qobject_cast<QTimer *>(sender());
-	if (timer == NULL) return;
+	if (!timer) return;
 
 	QMutexLocker locker(&TheMutex);
 	foreach (LockedFile * lockedFile, TheLockedFiles.values(timer->interval())) {
@@ -105,8 +99,8 @@ LockedFile * LockManager::makeLockedFile(const QString & path, long touchFrequen
 	TheMutex.lock();
 	TheLockedFiles.insert(touchFrequency, lockedFile);
 	TheMutex.unlock();
-	QTimer * timer = TheTimers.value(touchFrequency, NULL);
-	if (timer == NULL) {
+	QTimer * timer = TheTimers.value(touchFrequency, nullptr);
+	if (!timer) {
 		timer = new QTimer();
 		timer->setInterval(touchFrequency);
 		timer->setSingleShot(false);

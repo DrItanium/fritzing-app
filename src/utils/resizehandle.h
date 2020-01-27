@@ -31,13 +31,13 @@ class ResizeHandle : public QObject, public QGraphicsPixmapItem
 	Q_OBJECT
 
 public:
-	ResizeHandle(const QPixmap & pixmap, const QCursor &, bool ignoresTransforms, QGraphicsItem * parent = 0);
-	~ResizeHandle();
+	ResizeHandle(const QPixmap & pixmap, const QCursor &, bool ignoresTransforms, QGraphicsItem * parent = nullptr);
+	~ResizeHandle() = default;
 
-	QPointF resizeOffset();
+	constexpr QPointF resizeOffset() const noexcept { return m_resizeOffset; }
 	void setResizeOffset(QPointF);
 	double currentScale();
-	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
+	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr);
 
 public slots:
 	void zoomChangedSlot(double scale);

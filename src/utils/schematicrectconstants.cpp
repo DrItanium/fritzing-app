@@ -59,7 +59,7 @@ QString schematicPinNumber(qreal x, qreal y, qreal pinSmallTextHeight, const QSt
 	QString text;
 
 	qreal useX = x;
-	qreal offset = 1000 * (SchematicRectConstants::PinWidth - SchematicRectConstants::PinSmallTextVert) / 25.4;
+	constexpr qreal offset = 1000 * (SchematicRectConstants::PinWidth - SchematicRectConstants::PinSmallTextVert) / 25.4;
 	qreal useY = y - offset;
 
 	if (rotate) {
