@@ -1783,7 +1783,7 @@ void PEMainWindow::reload(bool firstTime)
 {
 	Q_UNUSED(firstTime);
 
-	CursorMaster::instance()->addCursor(this, Qt::WaitCursor);
+	CursorMaster::instance().addCursor(this, Qt::WaitCursor);
 
 	QList<ItemBase *> toDelete;
 
@@ -1862,7 +1862,7 @@ void PEMainWindow::reload(bool firstTime)
 	// processEventBlocker might be enough?
 	QTimer::singleShot(10, this, SLOT(initZoom()));
 
-	CursorMaster::instance()->removeCursor(this);
+	CursorMaster::instance().removeCursor(this);
 
 }
 

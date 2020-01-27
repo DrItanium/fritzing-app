@@ -111,7 +111,7 @@ void CursorMaster::initCursors()
 CursorMaster& CursorMaster::instance()
 {
     static CursorMaster TheCursorMaster;
-	return &TheCursorMaster;
+	return TheCursorMaster;
 }
 
 void CursorMaster::addCursor(QObject * object, const QCursor & cursor)

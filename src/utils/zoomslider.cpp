@@ -130,7 +130,6 @@ ZoomSlider::ZoomSlider(int maxValue, QWidget * parent) : QFrame(parent)
 	// layout doesn't seem to work: the slider appears too far down in the status bar
 	// because the status bar layout is privileged for the message text
 
-	m_firstTime = true;
 	if (ZoomFactors.size() == 0) {
 		loadFactors();
 	}
